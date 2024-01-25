@@ -3,6 +3,7 @@ import express, { Express } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDb } from "./config/database";
+import { problemRouter } from "./routers";
 
 dotenv.config()
 
@@ -11,6 +12,7 @@ app
   .use(cors())
   .use(express.json())
   .get("/health", (_req, res) => res.send("OK!"))
+  .use("/problem", problemRouter);
 
 export function init(): Promise<Express> {
   connectDb();
