@@ -14,3 +14,10 @@ export type ProblemsOutput = {
     acknowledged: number;
     severity: number;
 };
+
+export type EventsOutput = {
+    eventid: number;
+    clock: number;
+    name: string;
+    formatted_clock: string;
+}
