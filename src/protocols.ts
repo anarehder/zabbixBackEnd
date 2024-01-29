@@ -21,3 +21,10 @@ export type EventsOutput = {
     name: string;
     formatted_clock: string;
 }
+
+export type HostsOutpus = {
+    hostid: number;
+    host: string;
+    name: string;
+    name_upper: string;
+}
