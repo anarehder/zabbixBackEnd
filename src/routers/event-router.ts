@@ -6,6 +6,6 @@ import { Router } from "express";
 const eventRouter = Router();
 
 eventRouter.get("/", getEventController);
-eventRouter.get("/objectid", validateBody(getItemsSchema), getObjectIds);
+eventRouter.post("/objectid", validateBody(getItemsSchema), getObjectIds);
 
 export {eventRouter}
