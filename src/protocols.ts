@@ -43,3 +43,14 @@ export type ItemsOutput = {
 export type getItemsParams = {
     hostid: number;
 }
+
+export type ObjectIdOutput = {
+    eventid: number;
+    name: string;
+    objectid: string;
+}
+
+export type ObjectIdOutputFormatted = {
+    name: string;
+    objectid: string;
+}

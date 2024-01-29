@@ -1,11 +1,21 @@
-import { EventsOutput } from "@/protocols";
-import { getEventsRepository } from "@/repositories";
+import { EventsOutput, ObjectIdOutput, ObjectIdOutputFormatted } from "@/protocols";
+import { getEventsRepository, getObjectIdsRepository } from "@/repositories";
 
 export async function getEventService() {
     const responseDB: EventsOutput[] | any = await getEventsRepository();
     const response = calculateDuration(responseDB[0]);
     console.log(response.length);
     return response;
+}
+
+export async function getObjectIdsService(hostid: string){
+    const response: ObjectIdOutput[] = await getObjectIdsRepository(hostid);
+    // Filtrar para ter apenas um resultado para cada valor único de 'name'
+    const uniqueEvents: ObjectIdOutputFormatted[] = response
+    .filter((event, index, self) => index === self.findIndex((e) => e.objectid === event.objectid))
+    .map(({ eventid, ...rest }) => rest);
+
+    return uniqueEvents;
 }
 
 function calculateDuration(response: EventsOutput[]){
