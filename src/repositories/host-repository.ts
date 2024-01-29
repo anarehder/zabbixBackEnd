@@ -8,5 +8,5 @@ export async function getHostsRepository() {
         ORDER BY name DESC;`,
         ['Dellys%']
     );
-    return response;
+    return response[0];
 }

@@ -28,3 +28,18 @@ export type HostsOutpus = {
     name: string;
     name_upper: string;
 }
+
+export type ItemsOutput = {
+    itemid: number;
+    hostid: number;
+    name: string;
+    key_: string;
+    delay: string;
+    history: string;
+    trends: string;
+    units: string;
+}
+
+export type getItemsParams = {
+    hostid: number;
+}
