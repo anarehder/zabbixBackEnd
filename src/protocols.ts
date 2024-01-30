@@ -40,7 +40,7 @@ export type ItemsOutput = {
     units: string;
 }
 
-export type getItemsParams = {
+export type hostIdParams = {
     hostid: number;
 }
 
@@ -60,4 +60,12 @@ export type HistoryOutput = {
     clock: string;
     value: string;
     ns: string;
+}
+
+export type LinksHostsOutput = {
+    hostid: number;
+    host_name: string;
+    itemid: number;
+    item_name: string;
+    groupid: number;
 }
