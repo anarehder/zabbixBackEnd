@@ -3,11 +3,8 @@ import { getLastValueHistoryRepository, getLinkHostsWithItems } from "@/reposito
 import moment from "moment";
 
 export async function getLastValueHistoryService() {
-    
-
     const linkHosts = await getLinkHostsWithItems();
     const hostidsList: number[] = linkHosts.map(linkHost => linkHost.hostid);
-    console.log(hostidsList.length);
 
     const responseDB: HistoryOutput[] = await getLastValueHistoryRepository(hostidsList);
     const responseformatted = responseDB.map(item => ({
@@ -15,19 +12,30 @@ export async function getLastValueHistoryService() {
         clock_formatado: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
     }));
 
-    console.log(responseDB.length);
-    const resultadoFinal = linkHosts.map(obj1 => {
-        const obj2 = responseformatted.find(obj2 => Number(obj2.itemid) === obj1.itemid);
+    const responseFiltered = responseformatted.reduce((accumulator, currentItem) => {
+        const existingItemIndex = accumulator.findIndex(item => item.itemid === currentItem.itemid);
+
+        if (existingItemIndex !== -1) {
+            if (currentItem.clock > accumulator[existingItemIndex].clock) {
+                accumulator[existingItemIndex] = currentItem;
+            }
+        } else {
+            if (currentItem.value !== null) {
+                accumulator.push(currentItem);
+            }
+        }
+
+        return accumulator;
+    }, []);
+    
+    const resultadoFinal = responseFiltered.map(obj1 => {
+        const obj2 = linkHosts.find(obj2 => obj2.itemid === Number(obj1.itemid));
 
         if (obj2) {
-            // Se encontrou um correspondente, combina os objetos
             return {
                 ...obj1,
                 ...obj2
             };
-        } else {
-            // Se não encontrou, retorna apenas o objeto do primeiro array
-            return obj1;
         }
     });
 
