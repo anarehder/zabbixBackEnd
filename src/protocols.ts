@@ -54,3 +54,10 @@ export type ObjectIdOutputFormatted = {
     name: string;
     objectid: string;
 }
+
+export type HistoryOutput = {
+    itemid: string;
+    clock: string;
+    value: string;
+    ns: string;
+}

@@ -3,7 +3,7 @@ import express, { Express } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDb } from "./config/database";
-import { eventRouter, hostRouter, problemRouter } from "./routers";
+import { eventRouter, historyRouter, hostRouter, problemRouter } from "./routers";
 import { itemRouter } from "./routers/item-router";
 
 dotenv.config()
@@ -16,6 +16,7 @@ app
   .use("/problem", problemRouter)
   .use("/item", itemRouter)
   .use("/host", hostRouter)
+  .use("/history", historyRouter)
   .use("/event", eventRouter);
 
 export function init(): Promise<Express> {
