@@ -83,3 +83,8 @@ export type monthTrendParams = {
     itemid: number;
     month: string;
 }
+
+export type DayProblemParams = {
+    hostid: number;
+    day: string;
+}
