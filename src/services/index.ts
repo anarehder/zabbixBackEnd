@@ -3,3 +3,4 @@ export * from "./history-service";
 export * from "./host-service";
 export * from "./item-service";
 export * from "./problem-service";
+export * from "./trend-service";

@@ -3,3 +3,4 @@ export * from "./history-controller";
 export * from "./host-controller";
 export * from "./item-controller";
 export * from "./problem-controller";
+export * from "./trend-controller";

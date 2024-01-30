@@ -69,3 +69,17 @@ export type LinksHostsOutput = {
     item_name: string;
     groupid: number;
 }
+
+export type TrendsOutput = {
+    itemid: number;
+    clock: number;
+    num: number;
+    value_min: number;
+    value_avg: number;
+    value_max: number;
+}
+
+export type monthTrendParams = {
+    itemid: number;
+    month: string;
+}
