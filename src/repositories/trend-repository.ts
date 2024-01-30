@@ -21,5 +21,4 @@ export async function getMonthTrendByItemIdRepository(itemid: number, firstTimes
     });
 
     return response.data.result;
-}    const currentTime = Math.floor(Date.now() / 1000);  // Obter o timestamp atual em segundos
-const lastTime = currentTime - 300;
+}
