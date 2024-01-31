@@ -33,3 +33,13 @@ export function converterSegundosParaDHMS(segundos: number) {
     
     return duracaoFormatada;
 }
+
+export function last12MonthsList(){
+    const dataAtual = moment();
+    const resultados: string[] = [];
+    for (let i = 0; i < 12; i++) {
+        resultados.push(dataAtual.format('YYYY-MM'));
+        dataAtual.subtract(1, 'months');
+    }
+    return resultados;
+}
