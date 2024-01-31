@@ -16,11 +16,11 @@ export type ProblemsOutput = {
 };
 
 export type EventsOutput = {
-    eventid?: number;
-    clock?: number;
+    eventid: number;
+    clock: number;
     name: string;
-    objectid?: number;
-    severity?: number;
+    objectid: number;
+    severity: number;
     formatted_clock?: string;
 }
 
@@ -103,14 +103,6 @@ export type Event2Output = {
     name: string;
 }
 
-export type EventDBOutput = {
-    eventid: number;
-    objectid: number;
-    name: string;
-    clock: number;
-    severity: number;
-    clock_formatado?: string;
-}
 export type DuracaoPorDia = {
     [dia: string]: string;
 }
@@ -119,4 +111,14 @@ export type ResultadoEventos = {
     dia: string;
     duracao: string;
     porcentagem: string;
+}
+
+export type LinkDailyReport = {
+    objectid: number;
+    name: string;
+    day: string;
+    startedTime: number;
+    endedTime: number;
+    duration: number;
+    percentage: string;
 }

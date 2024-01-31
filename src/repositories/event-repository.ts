@@ -6,7 +6,7 @@ const authToken = '579099a2ea5c124912efa2b8c2bc0aa7338123beb0513aead603c2ebf4bff
 
 export async function getEventsRepository() {
     const response = await db.query (
-        `SELECT eventid, clock, name, FROM_UNIXTIME(clock) AS formatted_clock 
+        `SELECT eventid, objectid, name, clock, severity, FROM_UNIXTIME(clock) AS formatted_clock 
         FROM events 
         WHERE name LIKE ?
         ORDER BY eventid DESC;`,

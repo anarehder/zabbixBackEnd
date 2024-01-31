@@ -1,7 +1,7 @@
 import { getProblemsByHostidRepository, getProblemsRepository } from "@/repositories";
 import { getTimestampsOfDay, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
-import { EventDBOutput } from "@/protocols";
+import { EventsOutput } from "@/protocols";
 
 export async function getProblemService() {
     const response = await getProblemsRepository();
@@ -10,7 +10,7 @@ export async function getProblemService() {
 
 export async function getProblemsByHostidService(hostid: number, month: string) {
     const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
-    const responseDB: EventDBOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
+    const responseDB: EventsOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
     const response = responseDB
     .filter(item => item.name.includes('ICMP ping'))
     .map(item => ({

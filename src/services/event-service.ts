@@ -1,5 +1,5 @@
-import { DuracaoPorDia, Event2Output, EventDBOutput, EventsOutput, ObjectIdOutput, ObjectIdOutputFormatted, ResultadoEventos } from "@/protocols";
-import { getEventsByHostIdRepository, getEventsRepository, getObjectIdsRepository, getProblemsByHostidRepository } from "@/repositories"; 
+import { DuracaoPorDia, Event2Output, EventsOutput, LinkDailyReport, ObjectIdOutput, ObjectIdOutputFormatted, ResultadoEventos } from "@/protocols";
+import { getEventsByHostIdRepository, getEventsRepository, getObjectIdsRepository } from "@/repositories"; 
 import { converterSegundosParaDHMS, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
 import { getProblemsByHostidService } from "./problem-service";
@@ -21,7 +21,7 @@ export async function getObjectIdsService(hostid: string){
 
 export async function getLinkEventsByHostIdService(hostid: number, month: string) {
     const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
-    const eventDB: EventDBOutput[] = await getEventsByHostIdRepository(hostid, firstTimestamp, lastTimestamp);
+    const eventDB: EventsOutput[] = await getEventsByHostIdRepository(hostid, firstTimestamp, lastTimestamp);
     const eventFormatted = eventDB
     .filter(item => item.name.includes('ICMP ping'))
     .map(item => ({
@@ -34,16 +34,9 @@ export async function getLinkEventsByHostIdService(hostid: number, month: string
     return eventObject;
 }
 
-export async function getEventsByHostIdService(hostid: number, month: string) {
-    const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
-    const eventDB: EventDBOutput[] = await getEventsByHostIdRepository(hostid, firstTimestamp, lastTimestamp);
-    const eventFormatted = eventDB
-    .filter(item => item.name.includes('ICMP ping'))
-    .map(item => ({
-        ...item,
-        formatted_clock: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
-    }));
-    const eventCalculated: Event2Output[] = calculateDuration(eventFormatted);
+export async function getLinkDailyReportByHostIdService(hostid: number, month: string) {
+    const events = await getLinkEventsByHostIdService(hostid, month);
+    const eventCalculated: Event2Output[] = calculateDuration(events.event);
     const duracoes: ResultadoEventos[] = calcularDuracaoEventos(eventCalculated);
     return duracoes;
 }
