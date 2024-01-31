@@ -16,10 +16,12 @@ export type ProblemsOutput = {
 };
 
 export type EventsOutput = {
-    eventid: number;
-    clock: number;
+    eventid?: number;
+    clock?: number;
     name: string;
-    formatted_clock: string;
+    objectid?: number;
+    severity?: number;
+    formatted_clock?: string;
 }
 
 export type HostsOutpus = {
@@ -87,4 +89,34 @@ export type monthTrendParams = {
 export type DayProblemParams = {
     hostid: number;
     day: string;
+}
+
+export type MonthProblemParams = {
+    hostid: number;
+    month: string;
+}
+
+export type Event2Output = {
+    duracao: string;
+    inicioProblema: string;
+    fimProblema: string;
+    name: string;
+}
+
+export type EventDBOutput = {
+    eventid: number;
+    objectid: number;
+    name: string;
+    clock: number;
+    severity: number;
+    clock_formatado?: string;
+}
+export type DuracaoPorDia = {
+    [dia: string]: string;
+}
+
+export type ResultadoEventos = {
+    dia: string;
+    duracao: string;
+    porcentagem: string;
 }

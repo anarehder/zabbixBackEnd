@@ -11,18 +11,18 @@ export async function getProblemsRepository() {
     return response;
 }
 
-export async function getDayProblemsByHostidRepository(hostid: number, firstTimestamp: number, lastTimestamp:number) {
+export async function getProblemsByHostidRepository(hostid: number, firstTimestamp: number, lastTimestamp:number) {
 
     const response = await axios.post(apiUrl, {
         jsonrpc: '2.0',
         method: 'problem.get',
         params: {
-            output: 'extend',
-            hostids: 10682,
+            output: ['eventid', 'objectid', 'name', 'clock', 'severity'],
+            hostids: hostid,
             time_from: firstTimestamp,
             time_till: lastTimestamp,
             sortfield: ["eventid"],
-            sortorder: 'ASC',
+            sortorder: 'DESC',
         },
         auth: authToken,
         id: 1,

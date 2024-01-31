@@ -18,3 +18,18 @@ export function getTimestampsOfDay(day: string) {
 
     return { firstTimestamp, lastTimestamp };
 }
+
+export function converterSegundosParaDHMS(segundos: number) {
+    const dias = Math.floor(segundos / 86400); // 1 dia = 24 horas * 60 minutos * 60 segundos
+    segundos %= 86400;
+
+    const horas = Math.floor(segundos / 3600); // 1 hora = 60 minutos * 60 segundos
+    segundos %= 3600;
+
+    const minutos = Math.floor(segundos / 60); // 1 minuto = 60 segundos
+    segundos %= 60;
+
+    const duracaoFormatada = `${dias} dias, ${horas} horas, ${minutos} minutos, ${segundos} segundos`;
+    
+    return duracaoFormatada;
+}
