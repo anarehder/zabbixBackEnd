@@ -3,6 +3,6 @@ import { Router } from "express";
 
 const historyRouter = Router();
 
-historyRouter.get("/", getLastValueHistoryController);
+historyRouter.get("/links", getLastValueHistoryController);
 
 export {historyRouter}

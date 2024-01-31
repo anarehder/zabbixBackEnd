@@ -14,7 +14,7 @@ export async function getLastValueHistoryRepository(hostidsList: number[]) {
             output: 'extend',
             hostids: hostidsList,
             time_from: lastTime,
-            sortfield: 'clock',
+            sortfield: 'itemid',
             sortorder: 'ASC',
         },
         auth: authToken,
