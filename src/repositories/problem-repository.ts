@@ -27,6 +27,6 @@ export async function getProblemsByHostidRepository(hostid: number, firstTimesta
         auth: authToken,
         id: 1,
     });
-    console.log(response.data.result);
+
     return response.data.result;
 }

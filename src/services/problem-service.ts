@@ -11,10 +11,12 @@ export async function getProblemService() {
 export async function getProblemsByHostidService(hostid: number, month: string) {
     const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
     const responseDB: EventDBOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
-    const response = responseDB.map(item => ({
+    const response = responseDB
+    .filter(item => item.name.includes('ICMP ping'))
+    .map(item => ({
         ...item,
-        clock_formatado: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss'),
+        formatted_clock: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
     }));
-    const problemObject = {problem: response[0]};
+    const problemObject = {problem: response};
     return problemObject;
 }
