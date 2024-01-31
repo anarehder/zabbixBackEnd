@@ -122,3 +122,9 @@ export type LinkDailyReport = {
     duration: number;
     percentage: string;
 }
+
+export type LinkDailyTrendReport = {
+    itemid: number;
+    day: string;
+    average: string;
+}

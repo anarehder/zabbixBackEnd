@@ -1,6 +1,6 @@
-import { TrendsOutput } from "@/protocols";
-import { getMonthTrendByItemIdRepository } from "@/repositories";
-import { getTimestampsOfMonth } from "./manageTime-service";
+import { LinkDailyTrendReport, TrendsOutput } from "@/protocols";
+import { getDowntimes, getMonthTrendByItemIdRepository } from "@/repositories";
+import { getTimestampsOfDay, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
 
 export async function getMonthTrendByItemIdService(itemid: number, month: string) {
@@ -10,5 +10,22 @@ export async function getMonthTrendByItemIdService(itemid: number, month: string
         ...item,
         clock_formatado: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
     }));
+    return response;
+}
+
+export async function getLinkDailyTrendByItemIdService(itemid: number, month: string) {
+    const response: LinkDailyTrendReport[] = [];
+    const parsedMonth = new Date(`${month}-01`);
+    const days = new Date(parsedMonth.getFullYear(), parsedMonth.getMonth(), 0).getDate();
+    for (let i = 1; i <= days; i++){
+        const day = `${month}-${i.toString().padStart(2, '0')}`;
+        const { firstTimestamp, lastTimestamp } = getTimestampsOfDay(day);
+        const responseDB: TrendsOutput[] = await getMonthTrendByItemIdRepository(itemid, firstTimestamp, lastTimestamp);
+        const totalValueAvg = responseDB.reduce((accumulator, item) => accumulator + ((Number(item.value_max)+Number(item.value_min))/2), 0);
+        const dailyMedia = (totalValueAvg / responseDB.length)*100;
+        const objectResponse = {itemid: itemid, day: day, average: `${dailyMedia}%`}
+        response.push(objectResponse);
+    }
+    //const response: TrendsOutput[] = await getDowntimes(itemid, firstTimestamp, lastTimestamp);
     return response;
 }

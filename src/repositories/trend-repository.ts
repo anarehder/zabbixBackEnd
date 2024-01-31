@@ -22,3 +22,20 @@ export async function getMonthTrendByItemIdRepository(itemid: number, firstTimes
 
     return response.data.result;
 }
+
+export async function getDowntimes(itemid: number, firstTimestamp: number, lastTimestamp:number) {
+
+    const response = await axios.post(apiUrl, {
+        jsonrpc: '2.0',
+        method: 'sla.getsli',
+        params: {
+            slaid: 91,
+            serviceids: [310],
+            period_from: firstTimestamp,
+            period_to: lastTimestamp,
+        },
+        auth: authToken,
+        id: 1,
+    });
+    return response.data.result;
+}
