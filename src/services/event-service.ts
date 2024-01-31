@@ -1,5 +1,5 @@
 import { DuracaoPorDia, Event2Output, EventDBOutput, EventsOutput, ObjectIdOutput, ObjectIdOutputFormatted, ResultadoEventos } from "@/protocols";
-import { getEventsByHostIdRepository, getEventsRepository, getObjectIdsRepository } from "@/repositories"; 
+import { getEventsByHostIdRepository, getEventsRepository, getObjectIdsRepository, getProblemsByHostidRepository } from "@/repositories"; 
 import { converterSegundosParaDHMS, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
 
@@ -16,6 +16,21 @@ export async function getObjectIdsService(hostid: string){
     .map(({ eventid, ...rest }) => rest);
 
     return uniqueEvents;
+}
+
+export async function getLinkEventsByHostIdService(hostid: number, month: string) {
+    const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
+    const eventDB: EventDBOutput[] = await getEventsByHostIdRepository(hostid, firstTimestamp, lastTimestamp);
+    const eventFormatted = eventDB
+    .filter(item => item.name.includes('ICMP ping'))
+    .map(item => ({
+        ...item,
+        formatted_clock: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
+    }));
+    const problemDB: EventDBOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
+    const problemSize = problemDB.length;
+    const eventObject = {event: eventFormatted.slice(0,-problemSize)};
+    return eventObject;
 }
 
 export async function getEventsByHostIdService(hostid: number, month: string) {

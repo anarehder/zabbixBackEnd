@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getEventService, getEventsByHostIdService, getObjectIdsService } from "@/services/event-service";
+import { getEventService, getEventsByHostIdService, getLinkEventsByHostIdService, getObjectIdsService } from "@/services/event-service";
 
 export async function getEventController(req: Request, res: Response) {
     try{
@@ -23,12 +23,23 @@ export async function getObjectIds(req: Request, res: Response) {
     }
 }
 
-export async function getEventsByHostIdController(req: Request, res: Response) {
+export async function getLinkEventsByHostIdController(req: Request, res: Response) {
+    const hostid: number = req.body.hostid;
+    const month: string = req.body.month;
+    try{
+        const response = await getLinkEventsByHostIdService(hostid, month);
+        return res.status(httpStatus.OK).send(response);
+    } catch(error) {
+        return res.status(httpStatus.BAD_REQUEST).send(error);
+    }
+}
+
+export async function getLinkDailyReportByHostIdController(req: Request, res: Response) {
     const hostid: number = req.body.hostid;
     const month: string = req.body.month;
     try{
         const response = await getEventsByHostIdService(hostid, month);
-        return res.status(httpStatus.OK).send(response);
+        return res.status(httpStatus.OK).send("daily report");
     } catch(error) {
         return res.status(httpStatus.BAD_REQUEST).send(error);
     }
