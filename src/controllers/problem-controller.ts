@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getDayProblemsByHostidService, getProblemService } from "@/services";
+import { getProblemsByHostidService, getProblemService } from "@/services";
 
 export async function getProblemController(req: Request, res: Response) {
     try{
@@ -11,11 +11,11 @@ export async function getProblemController(req: Request, res: Response) {
     }
 }
 
-export async function getDayProblemsByHostidController(req: Request, res: Response) {
+export async function getProblemsByHostidController(req: Request, res: Response) {
     const hostid: number = req.body.hostid;
-    const day: string = req.body.day;
+    const month: string = req.body.month;
     try {
-        const response = await getDayProblemsByHostidService(hostid, day);
+        const response = await getProblemsByHostidService(hostid, month);
         return res.status(httpStatus.OK).send(response);
     } catch (error) {
         console.error('Erro durante a solicitação à API do Zabbix:', error.response.data);

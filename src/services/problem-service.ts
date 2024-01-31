@@ -1,5 +1,5 @@
 import { getProblemsByHostidRepository, getProblemsRepository } from "@/repositories";
-import { getTimestampsOfDay } from "./manageTime-service";
+import { getTimestampsOfDay, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
 import { EventDBOutput } from "@/protocols";
 
@@ -8,12 +8,13 @@ export async function getProblemService() {
     return response[0];
 }
 
-export async function getDayProblemsByHostidService(itemid: number, day: string) {
-    const { firstTimestamp, lastTimestamp } = getTimestampsOfDay(day);
-    const responseDB: EventDBOutput[] = await getProblemsByHostidRepository(itemid, firstTimestamp, lastTimestamp);
+export async function getProblemsByHostidService(hostid: number, month: string) {
+    const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
+    const responseDB: EventDBOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
     const response = responseDB.map(item => ({
         ...item,
         clock_formatado: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss'),
     }));
-    return response;
+    const problemObject = {problem: response[0]};
+    return problemObject;
 }

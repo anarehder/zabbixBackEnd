@@ -22,7 +22,7 @@ export async function getProblemsByHostidRepository(hostid: number, firstTimesta
             time_from: firstTimestamp,
             time_till: lastTimestamp,
             sortfield: ["eventid"],
-            sortorder: 'DESC',
+            sortorder: 'ASC',
         },
         auth: authToken,
         id: 1,
