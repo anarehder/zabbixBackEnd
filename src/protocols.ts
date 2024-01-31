@@ -17,7 +17,7 @@ export type ProblemsOutput = {
 
 export type EventsOutput = {
     eventid: number;
-    clock: number;
+    clock: string;
     name: string;
     objectid: number;
     severity: number;
@@ -101,6 +101,8 @@ export type Event2Output = {
     inicioProblema: string;
     fimProblema: string;
     name: string;
+    startStamp: number;
+    endStamp: number;
 }
 
 export type DuracaoPorDia = {

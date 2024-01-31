@@ -23,22 +23,38 @@ export async function getLinkEventsByHostIdService(hostid: number, month: string
     const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
     const eventDB: EventsOutput[] = await getEventsByHostIdRepository(hostid, firstTimestamp, lastTimestamp);
     const eventFormatted = eventDB
-    .filter(item => item.name.includes('ICMP ping'))
+    .filter(item => item.name.includes('Unavailable by ICMP ping'))
     .map(item => ({
         ...item,
         formatted_clock: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
     }));
     const problemDB = await getProblemsByHostidService(hostid, month);
     const problemSize = problemDB.problem.length;
-    const eventObject = {event: eventFormatted.slice(0,-problemSize)};
-    return eventObject;
+    if (problemSize > 1) {
+        const lastProblem = problemDB.problem.slice(-1)[0];
+        const eventObject = {event: eventFormatted, problem: lastProblem};
+        return eventObject;
+    } else {
+        const eventObject = {event: eventFormatted, problem: problemDB.problem};
+        return eventObject;
+    }
 }
 
 export async function getLinkDailyReportByHostIdService(hostid: number, month: string) {
     const events = await getLinkEventsByHostIdService(hostid, month);
-    const eventCalculated: Event2Output[] = calculateDuration(events.event);
-    const duracoes: ResultadoEventos[] = calcularDuracaoEventos(eventCalculated);
-    return duracoes;
+    const eventFormatted = events.event;
+    const eventLength = eventFormatted.length;
+    if (eventLength !== 0 && eventFormatted[0]?.severity == 0) {
+        const firstEvent = checkFirstEvent(eventFormatted[0]);
+        eventFormatted.unshift(firstEvent);
+    }
+    if (eventLength !== 0 && eventFormatted[eventLength-1]?.severity != 0) {
+        const lastEvent = checkLastEvent(eventFormatted[eventLength-1]);
+        eventFormatted.push(lastEvent);
+    }
+    const eventCalculated: Event2Output[] = calculateDuration(eventFormatted);
+    const duracoes: ResultadoEventos[] = dailyDuration(eventCalculated);
+    return eventCalculated;
 }
 
 function calculateDuration(response: EventsOutput[]){
@@ -47,15 +63,16 @@ function calculateDuration(response: EventsOutput[]){
     for (let i = 0; i < response.length; i += 2) {
         const pair_start = response[i];
         const start_timestamp = Number(pair_start.clock);
-        if (i+1 === response.length) {
-            const new_entry = {
-                "duracao": '0',
-                "inicioProblema": pair_start.formatted_clock,
-                "fimProblema": "null",
-                "name": pair_start.name
-            };        
-            new_array.push(new_entry);
-        } else {
+        // if (i+1 === response.length) {
+        //     const new_entry = {
+        //         "duracao": '0',
+        //         "inicioProblema": pair_start.formatted_clock,
+        //         "inicioStamp": start_timestamp,
+        //         "fimProblema": "null",
+        //         "name": pair_start.name
+        //     };        
+        //     new_array.push(new_entry);
+        // } else {
             const pair_end = response[i+1];
             const end_timestamp = Number(pair_end.clock);
             const duration_segundos = Math.floor((end_timestamp - start_timestamp));
@@ -63,16 +80,18 @@ function calculateDuration(response: EventsOutput[]){
             const new_entry = {
                 "duracao": duration,
                 "inicioProblema": pair_start.formatted_clock,
+                "startStamp": start_timestamp,
                 "fimProblema": response[i+1].formatted_clock,
+                "endStamp": end_timestamp,
                 "name": pair_start.name
             };
             new_array.push(new_entry);
-        }
+        //}
     }
     return new_array;
 }
 
-function calcularDuracaoEventos(eventos: Event2Output[]): ResultadoEventos[] {
+function dailyDuration(eventos: Event2Output[]): ResultadoEventos[] {
     const duracaoPorDia: DuracaoPorDia = {};
 
     eventos.forEach((evento) => {
@@ -126,4 +145,53 @@ function calcularDuracaoEventos(eventos: Event2Output[]): ResultadoEventos[] {
     }));
 
     return resultado;
+}
+
+function checkFirstEvent(event: EventsOutput) {
+    const dayString = `${event.formatted_clock.slice(0, 7)}-01T00:00:00.000Z`
+    const day = (new Date(dayString).getTime() / 1000).toFixed(0);
+    const newObject =
+    {
+        eventid: event.eventid,
+        objectid: event.objectid,
+        name: event.name,
+        clock: `${day}`,
+        severity: 1,
+        formatted_clock: moment(day).format('YYYY-MM-DD HH:mm:ss'),
+    };
+    return newObject;
+}
+
+function checkLastEvent(event: EventsOutput) {
+    const parsedMonth = new Date(`${event.formatted_clock.slice(0, 7)}-01`);
+    const days = new Date(parsedMonth.getFullYear(), parsedMonth.getMonth()+1, 0).getDate();
+    const dayString = `${event.formatted_clock.slice(0, 7)}-${days}T23:59:59.999Z`;
+    const today = new Date();
+    const day = (new Date(dayString).getTime() / 1000).toFixed(0);
+    // se hoje for maior que o ultimo dia do mês uso o ultimo dia do mês como last day
+    if (today >= new Date(dayString)){
+        const newObject =
+        {
+            eventid: event.eventid,
+            objectid: event.objectid,
+            name: event.name,
+            clock: `${day}`,
+            severity: 0,
+            formatted_clock: moment(day).format('YYYY-MM-DD HH:mm:ss'),
+        };
+        return newObject;
+    } else {
+        const todayTimestamp = (new Date().getTime()/1000).toFixed(0);
+        const newObject =
+        {
+            eventid: event.eventid,
+            objectid: event.objectid,
+            name: event.name,
+            clock: `${todayTimestamp}`,
+            severity: 0,
+            formatted_clock: moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss'),
+        };
+        return newObject;
+    }
+    
 }

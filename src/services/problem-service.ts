@@ -12,7 +12,7 @@ export async function getProblemsByHostidService(hostid: number, month: string) 
     const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
     const responseDB: EventsOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
     const response = responseDB
-    .filter(item => item.name.includes('ICMP ping'))
+    .filter(item => item.name.includes('Unavailable by ICMP ping'))
     .map(item => ({
         ...item,
         formatted_clock: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
