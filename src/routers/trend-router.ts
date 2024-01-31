@@ -5,7 +5,7 @@ import { Router } from "express";
 
 const trendRouter = Router();
 
-trendRouter.post("/month", validateBody(getMonthTrendsSchema), getMonthTrendByItemIdController);
+trendRouter.post("/link/daily", validateBody(getMonthTrendsSchema), getMonthTrendByItemIdController);
 trendRouter.post("/link/dailyreport", validateBody(getMonthTrendsSchema), getLinkDailyTrendByItemIdController);
 
 export {trendRouter}

@@ -10,7 +10,10 @@ export async function getMonthTrendByItemIdService(itemid: number, month: string
         ...item,
         clock_formatado: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
     }));
-    return response;
+
+    const trendsAverage = await getLinkDailyTrendByItemIdService(itemid, month);
+    const fullResponse: any = {graph: response, average: trendsAverage};
+    return fullResponse;
 }
 
 export async function getLinkDailyTrendByItemIdService(itemid: number, month: string) {
@@ -22,7 +25,7 @@ export async function getLinkDailyTrendByItemIdService(itemid: number, month: st
         const { firstTimestamp, lastTimestamp } = getTimestampsOfDay(day);
         const responseDB: TrendsOutput[] = await getMonthTrendByItemIdRepository(itemid, firstTimestamp, lastTimestamp);
         const totalValueAvg = responseDB.reduce((accumulator, item) => accumulator + ((Number(item.value_max)+Number(item.value_min))/2), 0);
-        const dailyMedia = (totalValueAvg / responseDB.length)*100;
+        const dailyMedia = ((totalValueAvg / responseDB.length)*100).toFixed(2);
         const objectResponse = {itemid: itemid, day: day, average: `${dailyMedia}%`}
         response.push(objectResponse);
     }

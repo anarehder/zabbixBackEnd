@@ -130,3 +130,8 @@ export type LinkDailyTrendReport = {
     day: string;
     average: string;
 }
+
+export type fullDailyReport = {
+    graph: TrendsOutput[];
+    average: LinkDailyTrendReport[];
+}
