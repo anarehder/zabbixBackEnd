@@ -2,6 +2,7 @@ import { DuracaoPorDia, Event2Output, EventDBOutput, EventsOutput, ObjectIdOutpu
 import { getEventsByHostIdRepository, getEventsRepository, getObjectIdsRepository, getProblemsByHostidRepository } from "@/repositories"; 
 import { converterSegundosParaDHMS, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
+import { getProblemsByHostidService } from "./problem-service";
 
 export async function getEventService() {
     const responseDB: EventsOutput[] | any = await getEventsRepository();
@@ -27,8 +28,8 @@ export async function getLinkEventsByHostIdService(hostid: number, month: string
         ...item,
         formatted_clock: moment.unix(Number(item.clock)).format('YYYY-MM-DD HH:mm:ss')
     }));
-    const problemDB: EventDBOutput[] = await getProblemsByHostidRepository(hostid, firstTimestamp, lastTimestamp);
-    const problemSize = problemDB.length;
+    const problemDB = await getProblemsByHostidService(hostid, month);
+    const problemSize = problemDB.problem.length;
     const eventObject = {event: eventFormatted.slice(0,-problemSize)};
     return eventObject;
 }
