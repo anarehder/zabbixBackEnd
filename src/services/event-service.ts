@@ -43,16 +43,15 @@ export async function getLinkEventsByHostIdService(hostid: number, month: string
 export async function getLinkDailyReportByHostIdService(hostid: number, month: string) {
     const events = await getLinkEventsByHostIdService(hostid, month);
     const eventFormatted = events.event;
-    const eventLength = eventFormatted.length;
-
     let lastProblem: EventsOutput;
+
     if (eventFormatted.length === 0) {
         lastProblem = await getLastProblemByHostidRepository(hostid);
         if (!lastProblem) {
             const eventCalculated: ResultadoEventos[] = [];
             const problemsDuration: ResultadoEventos[] = [];
             const fullEvents = completeMonth(month, problemsDuration);
-        const fullResponse = {eventFormatted:eventFormatted, eventCalculated: eventCalculated, fullEvents:fullEvents};
+            const fullResponse = {eventFormatted:eventFormatted, eventCalculated: eventCalculated, fullEvents:fullEvents};
         return fullResponse;
         }
         if (lastProblem?.severity !== 0){
@@ -62,14 +61,15 @@ export async function getLinkDailyReportByHostIdService(hostid: number, month: s
             eventFormatted.push(lastEvent);
         }        
     }
-    if (eventLength !== 0 && eventFormatted[0]?.severity == 0) {
+    if (eventFormatted.length !== 0 && eventFormatted[0]?.severity == 0) {
         const firstEvent = checkFirstEvent(eventFormatted[0], month);
         eventFormatted.unshift(firstEvent);
     }
-    if (eventLength !== 0 && eventFormatted[eventLength-1]?.severity != 0) {
-        const lastEvent = checkLastEvent(eventFormatted[eventLength-1], month);
+    if (eventFormatted.length !== 0 && Number(eventFormatted[eventFormatted.length-1]?.severity) !== 0 ) {
+        const lastEvent = checkLastEvent(eventFormatted[eventFormatted.length-1], month);
         eventFormatted.push(lastEvent);
     }
+
     const eventCalculated: Event2Output[] = calculateDuration(eventFormatted);
     const problemsDuration: ResultadoEventos[] = dailyDuration(eventCalculated, month);
     const fullEvents = completeMonth(month, problemsDuration);
@@ -129,44 +129,34 @@ function dailyDuration(eventos: Event2Output[], month: string): ResultadoEventos
 
     eventos.forEach((evento) => {
         const inicio = moment(evento.inicioProblema);
-        if (evento.duracao === '0'){
-            const month = Number(evento.inicioProblema.slice(5,7));
-            const year = Number(evento.inicioProblema.slice(0,4));
-            const ultimoDia = new Date(year,month,0).getDate();
-            if (ultimoDia.toString() !== evento.inicioProblema.slice(8,10)){
-                duracaoPorDia[inicio.format('YYYY-MM-DD')] = evento.inicioProblema;
-            }
+
+        const fim = moment(evento.fimProblema);
+
+        const diaInicio = inicio.format('YYYY-MM-DD');
+        const diaFim = fim.format('YYYY-MM-DD');
+        const duracaoDiasIntermediarios = 86400;
+        // Verificar se o evento se estende para mais de um dia
+        if (diaInicio === diaFim) {
+            // Evento ocorre no mesmo dia
+            const duracao = evento.endStamp - evento.startStamp;
+            const valorIncio = (Number(duracaoPorDia[diaInicio]) || 0) + duracao;
+            duracaoPorDia[diaInicio] = `${valorIncio}`;
         } else {
-            const fim = moment(evento.fimProblema);
+            // Evento se estende para mais de um dia
+            const duracaoPrimeiroDia = (1439 - inicio.hours() * 60 - inicio.minutes()) * 60;
+            const valorIncio = (Number(duracaoPorDia[diaInicio]) || 0) + duracaoPrimeiroDia;
+            duracaoPorDia[diaInicio] = `${valorIncio}`;
 
-            const diaInicio = inicio.format('YYYY-MM-DD');
-            const diaFim = fim.format('YYYY-MM-DD');
-            const duracaoDiasIntermediarios = 86400;
-            // Verificar se o evento se estende para mais de um dia
-            if (diaInicio === diaFim) {
-                // Evento ocorre no mesmo dia
-                const duracao = fim.diff(inicio, 'seconds');
-                const valorIncio = (Number(duracaoPorDia[diaInicio]) || 0) + duracao;
-                duracaoPorDia[diaInicio] = `${valorIncio}`;
-            } else {
-                // Evento se estende para mais de um dia
-                const duracaoPrimeiroDia = (1439 - inicio.hours() * 60 - inicio.minutes()) * 60;
-                const valorIncio = (Number(duracaoPorDia[diaInicio]) || 0) + duracaoPrimeiroDia;
-                duracaoPorDia[diaInicio] = `${valorIncio}`;
-
-                let diaAtual = inicio.clone().add(1, 'days');
-
-                while (!diaAtual.isSame(diaFim, 'day')) {
-                    const diaIntermediario = diaAtual.format('YYYY-MM-DD');
-                    const valorIntermediario = (Number(duracaoPorDia[diaInicio]) || 0) + duracaoDiasIntermediarios;
-                    duracaoPorDia[diaIntermediario] = `${valorIntermediario}`;
-                    diaAtual.add(1, 'days');
-                }
-
-                const duracaoUltimoDia = (fim.hours() * 60 + fim.minutes()) * 60;
-                const valorFim = (Number(duracaoPorDia[diaInicio]) || 0) + duracaoUltimoDia
-                duracaoPorDia[diaFim] = `${valorFim}`;;
+            let diaAtual = inicio.clone().add(1, 'days');
+            while (!diaAtual.isSame(diaFim, 'day')) {
+                const diaIntermediario = diaAtual.format('YYYY-MM-DD');
+                duracaoPorDia[diaIntermediario] = `${duracaoDiasIntermediarios}`;
+                diaAtual.add(1, 'days');
             }
+
+            const duracaoUltimoDia = fim.hours() * 3600 + fim.minutes() * 60 + fim.seconds();
+            const valorFim = (Number(duracaoPorDia[diaFim]) || 0) + duracaoUltimoDia
+            duracaoPorDia[diaFim] = `${valorFim}`;;
         }
     });
     const limitStart = new Date(`${month}-01T00:00:00.000`).getTime()/1000;

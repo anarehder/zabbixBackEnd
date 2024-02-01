@@ -20,7 +20,7 @@ export type EventsOutput = {
     clock: string;
     name: string;
     objectid: number;
-    severity: number;
+    severity: number | string;
     formatted_clock?: string;
 }
 
