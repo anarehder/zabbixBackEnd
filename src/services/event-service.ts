@@ -71,7 +71,7 @@ export async function getLinkDailyReportByHostIdService(hostid: number, month: s
         eventFormatted.push(lastEvent);
     }
     const eventCalculated: Event2Output[] = calculateDuration(eventFormatted);
-    const problemsDuration: ResultadoEventos[] = dailyDuration(eventCalculated);
+    const problemsDuration: ResultadoEventos[] = dailyDuration(eventCalculated, month);
     const fullEvents = completeMonth(month, problemsDuration);
     const fullResponse = {eventFormatted:eventFormatted, eventCalculated: eventCalculated, fullEvents:fullEvents};
     return fullResponse;
@@ -124,7 +124,7 @@ function calculateDuration(response: EventsOutput[]){
     return new_array;
 }
 
-function dailyDuration(eventos: Event2Output[]): ResultadoEventos[] {
+function dailyDuration(eventos: Event2Output[], month: string): ResultadoEventos[] {
     const duracaoPorDia: DuracaoPorDia = {};
 
     eventos.forEach((evento) => {
@@ -169,11 +169,13 @@ function dailyDuration(eventos: Event2Output[]): ResultadoEventos[] {
             }
         }
     });
-    if (eventos[0].endStamp <= Math.floor(new Date().getTime()/1000 + 300) ){
+    const limitStart = new Date(`${month}-01T00:00:00.000`).getTime()/1000;
+    const limitEnd = Math.floor(new Date().getTime()/1000 + 300);
+    if (eventos.length === 1 && eventos[0].startStamp === limitStart && eventos[0].endStamp <= limitEnd){
         const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([day, duration]) => ({
             day,
             duration,
-            average: "0",
+            average: '0',
         }));
         return resultado;
     } else {
