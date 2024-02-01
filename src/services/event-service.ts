@@ -44,15 +44,23 @@ export async function getLinkDailyReportByHostIdService(hostid: number, month: s
     const events = await getLinkEventsByHostIdService(hostid, month);
     const eventFormatted = events.event;
     const eventLength = eventFormatted.length;
+
     let lastProblem: EventsOutput;
     if (eventFormatted.length === 0) {
         lastProblem = await getLastProblemByHostidRepository(hostid);
+        if (!lastProblem) {
+            const eventCalculated: ResultadoEventos[] = [];
+            const problemsDuration: ResultadoEventos[] = [];
+            const fullEvents = completeMonth(month, problemsDuration);
+        const fullResponse = {eventFormatted:eventFormatted, eventCalculated: eventCalculated, fullEvents:fullEvents};
+        return fullResponse;
+        }
         if (lastProblem?.severity !== 0){
             const firstEvent = checkFirstEvent(lastProblem, month);
             eventFormatted.unshift(firstEvent);
             const lastEvent = checkLastEvent(eventFormatted[0], month);
             eventFormatted.push(lastEvent);
-        }
+        }        
     }
     if (eventLength !== 0 && eventFormatted[0]?.severity == 0) {
         const firstEvent = checkFirstEvent(eventFormatted[0], month);
@@ -77,16 +85,16 @@ function completeMonth(month: string, problemsDuration: ResultadoEventos[]) {
     for (let dia = 1; dia <= lastDay; dia++) {
         const formattedDay = dia.toString().padStart(2, "0");
         const checkDate = `${month}-${formattedDay}`;
-        const existingEvent = problemsDuration.find(event => event.dia === checkDate);
+        const existingEvent = problemsDuration.find(event => event.day === checkDate);
         if (existingEvent) {
             fullEvents.push(existingEvent);
         } else {
             const currentDate = new Date(`${month}-${formattedDay}`);
             const today = new Date();
             if (currentDate >= today) {
-                fullEvents.push({ dia: checkDate, duracao: "-", porcentagem: "-" });
+                fullEvents.push({ day: checkDate, duration: "-", average: "-" });
             } else {
-                fullEvents.push({ dia: checkDate, duracao: "0", porcentagem: "100.00" });
+                fullEvents.push({ day: checkDate, duration: "0", average: "100.00" });
             }
         }
     }
@@ -162,17 +170,17 @@ function dailyDuration(eventos: Event2Output[]): ResultadoEventos[] {
         }
     });
     if (eventos[0].endStamp <= Math.floor(new Date().getTime()/1000 + 300) ){
-        const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([dia, duracao]) => ({
-            dia,
-            duracao,
-            porcentagem: "0",
+        const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([day, duration]) => ({
+            day,
+            duration,
+            average: "0",
         }));
         return resultado;
     } else {
-        const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([dia, duracao]) => ({
-            dia,
-            duracao,
-            porcentagem: isNaN(Number(duracao)) ?  "calcular !" : (100-(Number(duracao)/ 86400) * 100).toFixed(4),
+        const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([day, duration]) => ({
+            day,
+            duration,
+            average: isNaN(Number(duration)) ?  "calcular !" : (100-(Number(duration)/ 86400) * 100).toFixed(4),
         }));
         return resultado;
     }

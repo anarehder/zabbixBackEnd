@@ -110,9 +110,9 @@ export type DuracaoPorDia = {
 }
 
 export type ResultadoEventos = {
-    dia: string;
-    duracao: string;
-    porcentagem: string;
+    day: string;
+    duration: string;
+    average: string;
 }
 
 export type LinkDailyReport = {

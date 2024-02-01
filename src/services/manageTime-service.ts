@@ -29,7 +29,7 @@ export function converterSegundosParaDHMS(segundos: number) {
     const minutos = Math.floor(segundos / 60); // 1 minuto = 60 segundos
     segundos %= 60;
 
-    const duracaoFormatada = `${dias} dias, ${horas} horas, ${minutos} minutos, ${segundos} segundos`;
+    const duracaoFormatada = `${dias} dias, ${horas} horas, ${minutos} min, ${segundos} seg`;
     
     return duracaoFormatada;
 }
