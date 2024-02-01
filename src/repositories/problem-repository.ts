@@ -48,3 +48,21 @@ export async function getLastProblemByHostidRepository(hostid: number) {
 
     return response.data.result[0];
 }
+
+export async function getProblemsByHostidListRepository(hostid: number[]) {
+
+    const response = await axios.post(apiUrl, {
+        jsonrpc: '2.0',
+        method: 'problem.get',
+        params: {
+            output: ['eventid', 'objectid', 'name', 'clock', 'severity'],
+            hostids: hostid,
+            sortfield: ["eventid"],
+            sortorder: 'ASC',
+        },
+        auth: authToken,
+        id: 1,
+    });
+
+    return response.data.result;
+}
