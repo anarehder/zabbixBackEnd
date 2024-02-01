@@ -1,5 +1,5 @@
 import { DuracaoPorDia, Event2Output, EventsOutput, LinkDailyReport, ObjectIdOutput, ObjectIdOutputFormatted, ResultadoEventos } from "@/protocols";
-import { getEventsByHostIdRepository, getEventsRepository, getObjectIdsRepository } from "@/repositories"; 
+import { getEventsByHostIdRepository, getEventsRepository, getLastProblemByHostidRepository, getObjectIdsRepository } from "@/repositories"; 
 import { converterSegundosParaDHMS, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
 import { getProblemsByHostidService } from "./problem-service";
@@ -44,35 +44,61 @@ export async function getLinkDailyReportByHostIdService(hostid: number, month: s
     const events = await getLinkEventsByHostIdService(hostid, month);
     const eventFormatted = events.event;
     const eventLength = eventFormatted.length;
+    let lastProblem: EventsOutput;
+    if (eventFormatted.length === 0) {
+        lastProblem = await getLastProblemByHostidRepository(hostid);
+        if (lastProblem?.severity !== 0){
+            const firstEvent = checkFirstEvent(lastProblem, month);
+            eventFormatted.unshift(firstEvent);
+            const lastEvent = checkLastEvent(eventFormatted[0], month);
+            eventFormatted.push(lastEvent);
+        }
+    }
     if (eventLength !== 0 && eventFormatted[0]?.severity == 0) {
-        const firstEvent = checkFirstEvent(eventFormatted[0]);
+        const firstEvent = checkFirstEvent(eventFormatted[0], month);
         eventFormatted.unshift(firstEvent);
     }
     if (eventLength !== 0 && eventFormatted[eventLength-1]?.severity != 0) {
-        const lastEvent = checkLastEvent(eventFormatted[eventLength-1]);
+        const lastEvent = checkLastEvent(eventFormatted[eventLength-1], month);
         eventFormatted.push(lastEvent);
     }
     const eventCalculated: Event2Output[] = calculateDuration(eventFormatted);
-    const duracoes: ResultadoEventos[] = dailyDuration(eventCalculated);
-    return eventCalculated;
+    const problemsDuration: ResultadoEventos[] = dailyDuration(eventCalculated);
+    const fullEvents = completeMonth(month, problemsDuration);
+    const fullResponse = {eventFormatted:eventFormatted, eventCalculated: eventCalculated, fullEvents:fullEvents};
+    return fullResponse;
+}
+
+function completeMonth(month: string, problemsDuration: ResultadoEventos[]) {
+    const parsedMonth = new Date(`${month}-01T00:00:00`);
+    const lastDay = new Date(parsedMonth.getFullYear(), parsedMonth.getMonth() + 1, 0).getDate();
+
+    const fullEvents: ResultadoEventos[] = [];
+    for (let dia = 1; dia <= lastDay; dia++) {
+        const formattedDay = dia.toString().padStart(2, "0");
+        const checkDate = `${month}-${formattedDay}`;
+        const existingEvent = problemsDuration.find(event => event.dia === checkDate);
+        if (existingEvent) {
+            fullEvents.push(existingEvent);
+        } else {
+            const currentDate = new Date(`${month}-${formattedDay}`);
+            const today = new Date();
+            if (currentDate >= today) {
+                fullEvents.push({ dia: checkDate, duracao: "-", porcentagem: "-" });
+            } else {
+                fullEvents.push({ dia: checkDate, duracao: "0", porcentagem: "100.00" });
+            }
+        }
+    }
+
+    return fullEvents;
 }
 
 function calculateDuration(response: EventsOutput[]){
     const new_array = [];
-
     for (let i = 0; i < response.length; i += 2) {
         const pair_start = response[i];
         const start_timestamp = Number(pair_start.clock);
-        // if (i+1 === response.length) {
-        //     const new_entry = {
-        //         "duracao": '0',
-        //         "inicioProblema": pair_start.formatted_clock,
-        //         "inicioStamp": start_timestamp,
-        //         "fimProblema": "null",
-        //         "name": pair_start.name
-        //     };        
-        //     new_array.push(new_entry);
-        // } else {
             const pair_end = response[i+1];
             const end_timestamp = Number(pair_end.clock);
             const duration_segundos = Math.floor((end_timestamp - start_timestamp));
@@ -86,7 +112,6 @@ function calculateDuration(response: EventsOutput[]){
                 "name": pair_start.name
             };
             new_array.push(new_entry);
-        //}
     }
     return new_array;
 }
@@ -136,19 +161,26 @@ function dailyDuration(eventos: Event2Output[]): ResultadoEventos[] {
             }
         }
     });
-
-    // Transformar o objeto em um array de objetos
-    const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([dia, duracao]) => ({
-        dia,
-        duracao,
-        porcentagem: isNaN(Number(duracao))?  "calcular !" : `${(100-(Number(duracao)/ 86400) * 100).toFixed(4)}%`,
-    }));
-
-    return resultado;
+    if (eventos[0].endStamp <= Math.floor(new Date().getTime()/1000 + 300) ){
+        const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([dia, duracao]) => ({
+            dia,
+            duracao,
+            porcentagem: "0",
+        }));
+        return resultado;
+    } else {
+        const resultado: ResultadoEventos[] = Object.entries(duracaoPorDia).map(([dia, duracao]) => ({
+            dia,
+            duracao,
+            porcentagem: isNaN(Number(duracao)) ?  "calcular !" : (100-(Number(duracao)/ 86400) * 100).toFixed(4),
+        }));
+        return resultado;
+    }
 }
 
-function checkFirstEvent(event: EventsOutput) {
-    const dayString = `${event.formatted_clock.slice(0, 7)}-01T00:00:00.000Z`
+function checkFirstEvent(event: EventsOutput, month: string) {
+    // pego o mes anterior a este, e pego o ultimo valor do events?
+    const dayString = `${month}-01T00:00:00.000`
     const day = (new Date(dayString).getTime() / 1000).toFixed(0);
     const newObject =
     {
@@ -156,19 +188,18 @@ function checkFirstEvent(event: EventsOutput) {
         objectid: event.objectid,
         name: event.name,
         clock: `${day}`,
-        severity: 1,
-        formatted_clock: moment(day).format('YYYY-MM-DD HH:mm:ss'),
+        severity: 55,
+        formatted_clock: `${month}-01 00:00:00`,
     };
     return newObject;
 }
 
-function checkLastEvent(event: EventsOutput) {
-    const parsedMonth = new Date(`${event.formatted_clock.slice(0, 7)}-01`);
+function checkLastEvent(event: EventsOutput, month:string) {
+    const parsedMonth = new Date(`${month}-01`);
     const days = new Date(parsedMonth.getFullYear(), parsedMonth.getMonth()+1, 0).getDate();
-    const dayString = `${event.formatted_clock.slice(0, 7)}-${days}T23:59:59.999Z`;
+    const dayString = `${month}-${days}T23:59:59.999`; //horario de brasilia
     const today = new Date();
     const day = (new Date(dayString).getTime() / 1000).toFixed(0);
-    // se hoje for maior que o ultimo dia do mês uso o ultimo dia do mês como last day
     if (today >= new Date(dayString)){
         const newObject =
         {
@@ -176,8 +207,8 @@ function checkLastEvent(event: EventsOutput) {
             objectid: event.objectid,
             name: event.name,
             clock: `${day}`,
-            severity: 0,
-            formatted_clock: moment(day).format('YYYY-MM-DD HH:mm:ss'),
+            severity: 50,
+            formatted_clock: `${month}-${days} 23:59:59`,
         };
         return newObject;
     } else {
@@ -188,7 +219,7 @@ function checkLastEvent(event: EventsOutput) {
             objectid: event.objectid,
             name: event.name,
             clock: `${todayTimestamp}`,
-            severity: 0,
+            severity: 50,
             formatted_clock: moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss'),
         };
         return newObject;

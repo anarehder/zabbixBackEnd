@@ -30,3 +30,21 @@ export async function getProblemsByHostidRepository(hostid: number, firstTimesta
 
     return response.data.result;
 }
+
+export async function getLastProblemByHostidRepository(hostid: number) {
+    const response = await axios.post(apiUrl, {
+        jsonrpc: '2.0',
+        method: 'problem.get',
+        params: {
+            output: ['eventid', 'objectid', 'name', 'clock', 'severity'],
+            hostids: hostid,
+            limit: 1, // Adiciona o parâmetro limit para obter apenas o problema mais recente
+            sortfield: ["eventid"],
+            sortorder: 'DESC', // Altera para ordem decrescente
+        },
+        auth: authToken,
+        id: 1,
+    });
+
+    return response.data.result[0];
+}

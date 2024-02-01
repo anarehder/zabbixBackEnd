@@ -43,3 +43,11 @@ export function last12MonthsList(){
     }
     return resultados;
 }
+
+export function lastMonth(month: string){
+    const thisMonth = moment(month, 'YYYY-MM');
+    const lastMonth = thisMonth.subtract(1, 'months');
+
+    const latMonthFormatted = lastMonth.format('YYYY-MM');
+    return latMonthFormatted;
+}
