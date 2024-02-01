@@ -18,15 +18,15 @@ export async function getMonthTrendByItemIdService(itemid: number, month: string
 
 export async function getLinkDailyTrendByItemIdService(itemid: number, month: string) {
     const response: LinkDailyTrendReport[] = [];
-    const parsedMonth = new Date(`${month}-01`);
-    const days = new Date(parsedMonth.getFullYear(), parsedMonth.getMonth(), 0).getDate();
+    const parsedMonth = new Date(`${month}-01T00:00:00`);
+    const days = new Date(parsedMonth.getFullYear(), parsedMonth.getMonth()+1, 0).getDate();
     for (let i = 1; i <= days; i++){
         const day = `${month}-${i.toString().padStart(2, '0')}`;
         const { firstTimestamp, lastTimestamp } = getTimestampsOfDay(day);
         const responseDB: TrendsOutput[] = await getMonthTrendByItemIdRepository(itemid, firstTimestamp, lastTimestamp);
         const totalValueAvg = responseDB.reduce((accumulator, item) => accumulator + ((Number(item.value_max)+Number(item.value_min))/2), 0);
         const dailyMedia = ((totalValueAvg / responseDB.length)*100).toFixed(2);
-        const objectResponse = {itemid: itemid, day: day, average: `${dailyMedia}%`}
+        const objectResponse = {itemid: itemid, day: day, average: `${dailyMedia}`}
         response.push(objectResponse);
     }
     //const response: TrendsOutput[] = await getDowntimes(itemid, firstTimestamp, lastTimestamp);
@@ -40,23 +40,23 @@ export async function getMonthlyAverageByItemIdService(itemid: number){
     while (i < 13) {
         const objectResponse = await calculateTrendAverage(months[i], itemid);
         response.push(objectResponse);
-        if (objectResponse.average === "0%"){
+        if (objectResponse.average === "0"){
             break;
         }
         i++;
     }
-    return response;
+    return response.reverse();
 }
 
 async function calculateTrendAverage(month: string, itemid: number){
     const { firstTimestamp, lastTimestamp } = getTimestampsOfMonth(month);
     const responseDB: TrendsOutput[] = await getMonthTrendByItemIdRepository(itemid, firstTimestamp, lastTimestamp);
     if(responseDB.length === 0) {
-        const objectResponse = {itemid: itemid, day: month, average: '0%'}
+        const objectResponse = {itemid: itemid, day: month, average: '0'}
     return objectResponse;
     }
     const totalValueAvg = responseDB.reduce((accumulator, item) => accumulator + ((Number(item.value_max)+Number(item.value_min))/2), 0);
     const dailyMedia = ((totalValueAvg / responseDB.length)*100).toFixed(2);
-    const objectResponse = {itemid: itemid, day: month, average: `${dailyMedia}%`}
+    const objectResponse = {itemid: itemid, day: month, average: `${dailyMedia}`}
     return objectResponse;
 }
