@@ -1,5 +1,6 @@
 import { EventsOutput, HistoryOutput, LinksHostsOutput } from "@/protocols";
-import { getLastValueHistoryRepository, getLinkHostsWithItems, getProblemsByHostidListRepository } from "@/repositories";
+import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesLinksFirewallRespository } from "@/repositories";
+import { response } from "express";
 import moment from "moment";
 
 export async function getLastValueHistoryService() {
@@ -43,4 +44,22 @@ export async function getLastValueHistoryService() {
 
     const joinedResult = {live: resultadoFinal, problems: filteredProblems}
     return joinedResult;
+}
+
+export async function getLinksFirewallService() {
+    const hosts = await getHostsLinksFirewallRepository();
+    const responseSent = [];
+    const responseReceived = [];
+    for (let i= 0; i< hosts.length; i++) {
+        const values = await getValuesLinksFirewallRespository(hosts[i].itemid);
+        const item = {...hosts[i], graph: values};
+        if (hosts[i].name.slice(-4) === "sent"){
+            responseSent.push(item);
+        }
+        if (hosts[i].name.slice(-4) === "ived"){
+            responseReceived.push(item);
+        }
+    }
+    const response = { sent: responseSent, received: responseReceived};
+    return response;
 }
