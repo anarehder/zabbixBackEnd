@@ -1,4 +1,4 @@
-import { getLastValueHistoryController, getLinksFirewallController, getServersLinuxController } from "@/controllers";
+import { getLastValueHistoryController, getLinksFirewallController, getServersLinuxController, getServersWindowsController } from "@/controllers";
 import { Router } from "express";
 
 const historyRouter = Router();
@@ -6,5 +6,6 @@ const historyRouter = Router();
 historyRouter.get("/links", getLastValueHistoryController);
 historyRouter.get("/linksfirewall", getLinksFirewallController);
 historyRouter.get("/serverslinux", getServersLinuxController);
+historyRouter.get("/serverswindows/:page", getServersWindowsController);
 
 export {historyRouter}

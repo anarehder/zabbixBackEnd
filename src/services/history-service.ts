@@ -1,5 +1,5 @@
 import { EventsOutput, HistoryOutput, LinksHostsOutput } from "@/protocols";
-import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersLinuxRepository } from "@/repositories";
+import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository } from "@/repositories";
 import moment from "moment";
 
 export async function getLastValueHistoryService() {
@@ -64,12 +64,35 @@ export async function getLinksFirewallService() {
 }
 
 export async function getServersLinuxService() {
-    const hosts = await getHostsServersLinuxRepository();
+    const server = "LINUX";
+    const hosts = await getHostsServersRepository(server);
     const response = [];
     for (let i= 0; i< hosts.length; i++) {
         const values = await getValuesUINTRespository(hosts[i].itemid);
         const item = {...hosts[i], graph: values};
             response.push(item);
     }
+    return response;
+}
+
+export async function getServersWindowsService(page: number) {
+    const itemsPerPage = 80;
+    const server = "WINDOWS";
+    const hosts = await getHostsServersRepository(server);
+    const totalPages = Math.ceil(hosts.length / itemsPerPage);
+    if (page > totalPages){
+        throw new Error('Página solicitada está fora do intervalo válido.');
+    }
+    
+    const firstItem = (page-1)*itemsPerPage;
+    const lastItem = firstItem+itemsPerPage;
+    const paginationHosts = hosts.slice(firstItem, lastItem);
+    const responseValues = [];
+    for (let i= 0; i< paginationHosts.length; i++) {
+        const values = await getValuesUINTRespository(hosts[i].itemid);
+        const item = {...paginationHosts[i], graph: values};
+        responseValues.push(item);
+    }
+    const response = { pageData: {totalPages: totalPages, actualPage: page}, values: responseValues};
     return response;
 }

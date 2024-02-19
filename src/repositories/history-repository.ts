@@ -75,7 +75,7 @@ export async function getValuesUINTRespository(itemid: number) {
     return response[0];
 }
 
-export async function getHostsServersLinuxRepository(){
+export async function getHostsServersRepository(server: string){
     const response = await db.query<RowDataPacket[]>(`
     SELECT 
         hstgrp.groupid,
@@ -99,7 +99,7 @@ export async function getHostsServersLinuxRepository(){
     ORDER BY 
         hosts.host ASC;
     `,
-    ['DELLYS/SRV_LINUX','ICMP ping']
+    [`DELLYS/SRV_${server}`,'ICMP ping']
     );
 
     return response[0];
