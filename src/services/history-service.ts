@@ -76,7 +76,7 @@ export async function getServersLinuxService() {
 }
 
 export async function getServersWindowsService(page: number) {
-    const itemsPerPage = 80;
+    const itemsPerPage = 40;
     const server = "WINDOWS";
     const hosts = await getHostsServersRepository(server);
     const totalPages = Math.ceil(hosts.length / itemsPerPage);
