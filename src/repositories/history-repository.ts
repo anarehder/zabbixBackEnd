@@ -55,7 +55,7 @@ export async function getHostsLinksFirewallRepository(){
     return response[0];
 }
 
-export async function getValuesLinksFirewallRespository(itemid: number) {
+export async function getValuesUINTRespository(itemid: number) {
     const response = await db.query<RowDataPacket[]>(`
         SELECT 
             FROM_UNIXTIME(history_uint.clock) AS formatted_clock, 
@@ -70,6 +70,36 @@ export async function getValuesLinksFirewallRespository(itemid: number) {
             history_uint.itemid = ${itemid} AND FROM_UNIXTIME(history_uint.clock) >= DATE_SUB(NOW(), INTERVAL 12 HOUR)
         ORDER BY formatted_clock ASC;
     `,
+    );
+
+    return response[0];
+}
+
+export async function getHostsServersLinuxRepository(){
+    const response = await db.query<RowDataPacket[]>(`
+    SELECT 
+        hstgrp.groupid,
+        hstgrp.name AS groupName,
+        hosts_groups.hostid,
+        hosts.host,
+        items.itemid,
+        items.name,
+        items.units,
+        items.delay
+    FROM 
+        hstgrp
+    JOIN 
+        hosts_groups ON hstgrp.groupid = hosts_groups.groupid
+    JOIN 
+        hosts ON hosts_groups.hostid = hosts.hostid
+    JOIN
+        items ON items.hostid = hosts.hostid
+    WHERE 
+        hstgrp.name LIKE ? AND items.name = ? 
+    ORDER BY 
+        hosts.host ASC;
+    `,
+    ['DELLYS/SRV_LINUX','ICMP ping']
     );
 
     return response[0];
