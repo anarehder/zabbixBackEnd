@@ -2,7 +2,7 @@ import { db } from "@/config/database";
 
 export async function getReportRepository(groupid: number, start: string, end: string) {
     const startFull = `${start} 00:00:00`;
-    const endFull = `${end} 10:00:00`;
+    const endFull = `${end} 00:00:00`;
     const response = await db.query (
         `SELECT
             hosts.name AS Host,

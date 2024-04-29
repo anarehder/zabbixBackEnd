@@ -1,3 +1,4 @@
+import { invalidInputError } from "@/errors";
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { ObjectSchema } from "joi";
@@ -20,7 +21,7 @@ function validate(schema: ObjectSchema, type: "body" | "params") {
       next();
     } else {
       error.details.map((d) => console.log(d.message));
-      res.status(httpStatus.BAD_REQUEST).send("Problema na validação");
+      res.status(httpStatus.BAD_REQUEST).send(invalidInputError(error.details.map((d) => d.message)));
     }
   };
 }

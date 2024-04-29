@@ -1,3 +1,8 @@
+export type ApplicationError = {
+    name: string;
+    message: string;
+};
+
 export type ProblemsOutput = {
     eventid: number;
     source: number; 
