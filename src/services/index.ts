@@ -4,4 +4,5 @@ export * from "./host-service";
 export * from "./item-service";
 export * from "./manageTime-service";
 export * from "./problem-service";
+export * from "./report-service";
 export * from "./trend-service";

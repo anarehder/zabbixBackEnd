@@ -19,6 +19,7 @@ function validate(schema: ObjectSchema, type: "body" | "params") {
     if (!error) {
       next();
     } else {
+      error.details.map((d) => console.log(d.message));
       res.status(httpStatus.BAD_REQUEST).send("Problema na validação");
     }
   };

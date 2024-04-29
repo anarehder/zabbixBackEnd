@@ -3,7 +3,7 @@ import express, { Express } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDb } from "./config/database";
-import { eventRouter, historyRouter, hostRouter, problemRouter } from "./routers";
+import { eventRouter, historyRouter, hostRouter, problemRouter, reportRouter } from "./routers";
 import { itemRouter } from "./routers/item-router";
 import { trendRouter } from "./routers/trend-router";
 
@@ -19,7 +19,8 @@ app
   .use("/item", itemRouter)
   .use("/host", hostRouter)
   .use("/history", historyRouter)
-  .use("/event", eventRouter);
+  .use("/event", eventRouter)
+  .use("/report", reportRouter);
 
 export function init(): Promise<Express> {
   connectDb();

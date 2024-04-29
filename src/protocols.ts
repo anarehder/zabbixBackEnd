@@ -135,3 +135,9 @@ export type fullDailyReport = {
     graph: TrendsOutput[];
     average: LinkDailyTrendReport[];
 }
+
+export type reportInput = {
+    groupid: number;
+    start: string;
+    end: string;
+}
