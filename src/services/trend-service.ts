@@ -1,5 +1,5 @@
-import { LinkDailyTrendReport, TrendsOutput } from "@/protocols";
-import { getDowntimes, getMonthTrendByItemIdRepository } from "@/repositories";
+import { LinkDailyTrendReport, TrendsOutput } from "../protocols";
+import { getDowntimes, getMonthTrendByItemIdRepository } from "../repositories";
 import { getTimestampsOfDay, getTimestampsOfMonth, last12MonthsList } from "./manageTime-service";
 import moment from "moment";
 

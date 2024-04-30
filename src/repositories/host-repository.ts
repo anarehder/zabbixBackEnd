@@ -1,5 +1,5 @@
-import { db } from "@/config/database";
-import { LinksHostsOutput } from "@/protocols";
+import { db } from "../config/database";
+import { LinksHostsOutput } from "../protocols";
 import { RowDataPacket } from "mysql2";
 
 export async function getHostsRepository() {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { db } from "@/config/database";
+import { db } from "../config/database";
 import { RowDataPacket } from "mysql2";
 
 const apiUrl = "http://100.101.1.189/api_jsonrpc.php";

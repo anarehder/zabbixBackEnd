@@ -1,7 +1,7 @@
-import { getProblemsByHostidRepository, getProblemsRepository } from "@/repositories";
+import { getProblemsByHostidRepository, getProblemsRepository } from "../repositories";
 import { getTimestampsOfDay, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
-import { EventsOutput } from "@/protocols";
+import { EventsOutput } from "../protocols";
 
 export async function getProblemService() {
     const response = await getProblemsRepository();

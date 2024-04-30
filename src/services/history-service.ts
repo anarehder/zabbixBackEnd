@@ -1,5 +1,5 @@
-import { EventsOutput, HistoryOutput, LinksHostsOutput } from "@/protocols";
-import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository } from "@/repositories";
+import { EventsOutput, HistoryOutput, LinksHostsOutput } from "../protocols";
+import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository } from "../repositories";
 import moment from "moment";
 
 export async function getLastValueHistoryService() {

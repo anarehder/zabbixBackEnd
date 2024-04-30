@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getReportService } from "@/services";
+import { getReportService } from "../services";
 
 export async function getReportController(req: Request, res: Response) {
     const { groupid, start, end }  = req.body;

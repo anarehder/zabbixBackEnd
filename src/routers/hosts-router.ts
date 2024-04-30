@@ -1,4 +1,4 @@
-import { getHostsController } from "@/controllers/host-controller";
+import { getHostsController } from "../controllers/host-controller";
 import { Router } from "express";
 
 const hostRouter = Router();

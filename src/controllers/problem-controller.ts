@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getProblemsByHostidService, getProblemService } from "@/services";
+import { getProblemsByHostidService, getProblemService } from "../services";
 
 export async function getProblemController(req: Request, res: Response) {
     try{

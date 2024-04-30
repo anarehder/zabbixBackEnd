@@ -1,4 +1,4 @@
-import { db } from "@/config/database";
+import { db } from "../config/database";
 
 export async function getItemsRepository(hostid: number) {
     console.log("cheguei no rep");

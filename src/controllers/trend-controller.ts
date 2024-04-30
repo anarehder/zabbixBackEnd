@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getLinkDailyTrendByItemIdService, getMonthTrendByItemIdService, getMonthlyAverageByItemIdService } from "@/services";
+import { getLinkDailyTrendByItemIdService, getMonthTrendByItemIdService, getMonthlyAverageByItemIdService } from "../services";
 
 export async function getMonthTrendByItemIdController(req: Request, res: Response) {
     const itemid: number = req.body.itemid;

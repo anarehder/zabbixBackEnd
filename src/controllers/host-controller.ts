@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getHostsService } from "@/services";
+import { getHostsService } from "../services";
 
 export async function getHostsController(req: Request, res: Response) {
     try{

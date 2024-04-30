@@ -1,4 +1,4 @@
-import { db } from "@/config/database";
+import { db } from "../config/database";
 import axios from "axios";
 
 const apiUrl = "http://100.101.1.189/api_jsonrpc.php";

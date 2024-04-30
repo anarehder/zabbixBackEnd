@@ -1,6 +1,6 @@
-import { getLinkDailyTrendByItemIdController, getMonthTrendByItemIdController, getMonthlyAverageByItemIdController } from "@/controllers";
-import { validateBody } from "@/middlewares";
-import { getMonthTrendsSchema } from "@/schemas/getMonthTrends-schema";
+import { getLinkDailyTrendByItemIdController, getMonthTrendByItemIdController, getMonthlyAverageByItemIdController } from "../controllers";
+import { validateBody } from "../middlewares";
+import { getMonthTrendsSchema } from "../schemas/getMonthTrends-schema";
 import { Router } from "express";
 
 const trendRouter = Router();

@@ -1,7 +1,7 @@
-import { getEventController, getLinkDailyReportByHostIdController, getLinkEventsByHostIdController, getObjectIds } from "@/controllers";
-import { validateBody } from "@/middlewares";
-import { getItemsSchema } from "@/schemas";
-import { getMonthProblemsSchema } from "@/schemas/getMonthProblems-schema";
+import { getEventController, getLinkDailyReportByHostIdController, getLinkEventsByHostIdController, getObjectIds } from "../controllers";
+import { validateBody } from "../middlewares";
+import { getItemsSchema } from "../schemas";
+import { getMonthProblemsSchema } from "../schemas/getMonthProblems-schema";
 import { Router } from "express";
 
 const eventRouter = Router();

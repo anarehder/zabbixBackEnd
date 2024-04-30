@@ -1,4 +1,4 @@
-import { getItemsRepository } from "@/repositories";
+import { getItemsRepository } from "../repositories";
 import { ItemsOutput } from "../protocols";
 
 export async function getItemsService(hostid: number) {

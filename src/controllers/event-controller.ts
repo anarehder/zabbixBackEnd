@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getEventService, getLinkDailyReportByHostIdService, getLinkEventsByHostIdService, getObjectIdsService } from "@/services/event-service";
+import { getEventService, getLinkDailyReportByHostIdService, getLinkEventsByHostIdService, getObjectIdsService } from "../services/event-service";
 
 export async function getEventController(req: Request, res: Response) {
     try{

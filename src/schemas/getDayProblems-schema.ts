@@ -1,4 +1,4 @@
-import { DayProblemParams } from "@/protocols";
+import { DayProblemParams } from "../protocols";
 import Joi from "joi";
 
 export const getDayProblemsSchema = Joi.object<DayProblemParams>({

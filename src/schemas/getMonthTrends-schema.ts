@@ -1,4 +1,4 @@
-import { monthTrendParams } from "@/protocols";
+import { monthTrendParams } from "../protocols";
 import Joi from "joi";
 
 export const getMonthTrendsSchema = Joi.object<monthTrendParams>({

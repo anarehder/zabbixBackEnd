@@ -1,5 +1,5 @@
-import { DuracaoPorDia, Event2Output, EventsOutput, LinkDailyReport, ObjectIdOutput, ObjectIdOutputFormatted, ResultadoEventos } from "@/protocols";
-import { getEventsByHostIdRepository, getEventsRepository, getLastProblemByHostidRepository, getObjectIdsRepository } from "@/repositories"; 
+import { DuracaoPorDia, Event2Output, EventsOutput, LinkDailyReport, ObjectIdOutput, ObjectIdOutputFormatted, ResultadoEventos } from "../protocols";
+import { getEventsByHostIdRepository, getEventsRepository, getLastProblemByHostidRepository, getObjectIdsRepository } from "../repositories"; 
 import { converterSegundosParaDHMS, getTimestampsOfMonth } from "./manageTime-service";
 import moment from "moment";
 import { getProblemsByHostidService } from "./problem-service";

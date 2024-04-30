@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getLastValueHistoryService, getLinksFirewallService, getServersLinuxService, getServersWindowsService } from "@/services";
+import { getLastValueHistoryService, getLinksFirewallService, getServersLinuxService, getServersWindowsService } from "../services";
 
 export async function getLastValueHistoryController(req: Request, res: Response) {
     try{
