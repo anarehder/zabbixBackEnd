@@ -36,6 +36,12 @@ export type HostsOutpus = {
     name_upper: string;
 }
 
+export type HostGroupsOutputs = {
+    groupid: number;
+    name: string;
+    uuid: string;
+}
+
 export type ItemsOutput = {
     itemid: number;
     hostid: number;

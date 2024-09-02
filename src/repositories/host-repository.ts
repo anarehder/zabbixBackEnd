@@ -13,6 +13,17 @@ export async function getHostsRepository() {
     return response[0];
 }
 
+export async function getHostGroupsRepository() {
+    const response = await db.query (
+        `SELECT groupid, name, uuid
+        FROM hstgrp 
+        WHERE name NOT LIKE ?
+        ORDER BY name ASC;`,
+        ['%/%']
+    );
+    return response[0];
+}
+
 export async function getLinkHostsWithItems(){
     const [rows] = await db.query <RowDataPacket[]> (`
         SELECT hosts.hostid As hostid, hosts.name AS host_name, items.itemid As itemid, items.name AS item_name, groupid
