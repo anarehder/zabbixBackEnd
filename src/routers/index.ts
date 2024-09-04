@@ -1,3 +1,4 @@
+export * from "./alerts-router";
 export * from "./event-router";
 export * from "./history-router";
 export * from "./hosts-router";

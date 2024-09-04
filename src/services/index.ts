@@ -1,3 +1,4 @@
+export * from "./alerts-service";
 export * from "./event-service";
 export * from "./history-service";
 export * from "./host-service";

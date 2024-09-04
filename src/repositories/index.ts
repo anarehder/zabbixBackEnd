@@ -1,3 +1,4 @@
+export * from "./alerts-repository";
 export * from "./event-repository";
 export * from "./history-repository";
 export * from "./host-repository";

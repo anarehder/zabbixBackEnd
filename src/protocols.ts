@@ -152,3 +152,24 @@ export type reportInput = {
     start: string;
     end: string;
 }
+
+export type alertsInput = {
+    groupid: number;
+    date_interval: string;
+    limit: number;
+    type: string;
+}
+
+export type alertsOutput = {
+    Host: string;
+    Interface: string;
+    Alerta: string;
+    Severidade: string;
+    Total: number;
+    groupName: string;
+    event_severity: number;
+    event_ids?: string;
+    event_times?: string;
+    items?: string;
+    items_descip?: string;
+}
