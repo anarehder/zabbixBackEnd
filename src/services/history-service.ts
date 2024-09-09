@@ -1,5 +1,5 @@
 import { EventsOutput, HistoryOutput, LinksHostsOutput } from "../protocols";
-import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository } from "../repositories";
+import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository, getLinksLatestValuesByGroupIdRepository, getLinksProblemsByGroupIpRepository } from "../repositories";
 import moment from "moment";
 
 export async function getLastValueHistoryService() {
@@ -43,6 +43,13 @@ export async function getLastValueHistoryService() {
 
     const joinedResult = {live: resultadoFinal, problems: filteredProblems}
     return joinedResult;
+}
+
+export async function getLinksValuesProblemsService(groupId: number) {
+    const latestLinkValues = await getLinksLatestValuesByGroupIdRepository(groupId);
+    const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
+    const response = {values: latestLinkValues, problems: linksProblems};
+    return(response);
 }
 
 export async function getLinksFirewallService() {

@@ -83,6 +83,28 @@ export type LinksHostsOutput = {
     groupid: number;
 }
 
+export type LinksLatestValues ={
+    hostId: number;
+    ip: string;
+    hostName: string;
+    itemId: number;
+    itemName: string;
+    groupid: number;
+    value: number;
+    lastUpdate: string;
+}
+
+export type LinksLatestProblems = {
+    hostId: number;
+    ip: string;
+    hostName: string;
+    itemId: number;
+    itemName: string;
+    groupid: number;
+    problemName: string;
+    problemTime: string;
+}
+
 export type TrendsOutput = {
     itemid: number;
     clock: number;
