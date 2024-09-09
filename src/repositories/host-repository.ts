@@ -1,5 +1,5 @@
 import { db } from "../config/database";
-import { LinksHostsOutput } from "../protocols";
+import { hostGroupsInfo, LinksHostsOutput } from "../protocols";
 import { RowDataPacket } from "mysql2";
 
 export async function getHostsRepository() {
@@ -14,14 +14,57 @@ export async function getHostsRepository() {
 }
 
 export async function getHostGroupsRepository() {
-    const response = await db.query (
+    const [rows] = await db.query <RowDataPacket[]>(
         `SELECT groupid, name, uuid
         FROM hstgrp 
         WHERE name NOT LIKE ?
         ORDER BY name ASC;`,
         ['%/%']
     );
-    return response[0];
+    
+    const typedResults: hostGroupsInfo[] = rows.map((row) => ({
+        groupId: row.groupid,
+        groupName: row.name,
+        uuid: row.uuid
+    }));
+    
+    return typedResults;
+}
+
+export async function getHostGroupsSubdivisionRepository(groupName: string) {
+    const [rows] = await db.query <RowDataPacket[]>(
+        `SELECT groupid, name, uuid
+        FROM hstgrp 
+        WHERE name LIKE ? AND name LIKE ?
+        ORDER BY name ASC;`,
+        [`%${groupName}%`,'%/%']
+    );
+    
+    const typedResults: hostGroupsInfo[] = rows.map((row) => ({
+        groupId: row.groupid,
+        groupName: row.name,
+        uuid: row.uuid
+    }));
+    
+    return typedResults;
+}
+
+export async function getHostGroupsLinksRepository(groupName: string) {
+    const [rows] = await db.query <RowDataPacket[]>(
+        `SELECT groupid, name, uuid
+        FROM hstgrp 
+        WHERE name LIKE ? AND name LIKE ?
+        ORDER BY name ASC;`,
+        [`%${groupName}%`,'%LINK%']
+    );
+
+    const typedResults: hostGroupsInfo[] = rows.map((row) => ({
+        groupId: row.groupid,
+        groupName: row.name,
+        uuid: row.uuid
+    }));
+    
+    return typedResults;
 }
 
 export async function getLinkHostsWithItems(){

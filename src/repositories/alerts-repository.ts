@@ -1,6 +1,6 @@
 import { db } from "../config/database";
 
-export async function getDayAlertsRepository(groupid: number, date_interval: string, limit: number) {
+export async function getDayAlertsRepository(groupId: number, date_interval: string, limit: number) {
     const response = await db.query (
         `SELECT
             hosts.name AS Host,
@@ -46,12 +46,12 @@ export async function getDayAlertsRepository(groupid: number, date_interval: str
         ORDER BY
             total DESC
 		LIMIT ?;`,
-        [groupid, date_interval, limit]
+        [groupId, date_interval, limit]
     );
     return response[0];
 }
 
-export async function getRangeAlertsRepository(groupid: number, date_interval: string, limit: number) {
+export async function getRangeAlertsRepository(groupId: number, date_interval: string, limit: number) {
     const response = await db.query (
         `SELECT
             hosts.name AS Host,
@@ -97,7 +97,7 @@ export async function getRangeAlertsRepository(groupid: number, date_interval: s
         ORDER BY
             total DESC
 		LIMIT ?;`,
-        [groupid, limit]
+        [groupId, limit]
     );
     return response[0];
 }

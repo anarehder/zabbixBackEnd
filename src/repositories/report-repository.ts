@@ -1,6 +1,6 @@
 import { db } from "../config/database";
 
-export async function getReportRepository(groupid: number, start: string, end: string) {
+export async function getReportRepository(groupId: number, start: string, end: string) {
     const startFull = `${start} 00:00:00`;
     const endFull = `${end} 00:00:00`;
     const response = await db.query (
@@ -46,7 +46,7 @@ export async function getReportRepository(groupid: number, start: string, end: s
             hosts.name, events.name, events.severity -- Removendo a agregação por events.name
         ORDER BY
             total DESC;`,
-        [groupid, startFull, endFull]
+        [groupId, startFull, endFull]
     );
     return response[0];
 }

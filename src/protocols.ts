@@ -148,13 +148,13 @@ export type fullDailyReport = {
 }
 
 export type reportInput = {
-    groupid: number;
+    groupId: number;
     start: string;
     end: string;
 }
 
 export type alertsInput = {
-    groupid: number;
+    groupId: number;
     date_interval: string;
     limit: number;
     type: string;
@@ -172,4 +172,10 @@ export type alertsOutput = {
     event_times?: string;
     items?: string;
     items_descip?: string;
+}
+
+export type hostGroupsInfo = {
+    groupId: number;
+    groupName: string;
+    uuid: string;
 }
