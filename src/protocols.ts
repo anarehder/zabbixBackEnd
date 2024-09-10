@@ -180,6 +180,7 @@ export type alertsInput = {
     date_interval: string;
     limit: number;
     type: string;
+    severity: number;
 }
 
 export type alertsOutput = {
