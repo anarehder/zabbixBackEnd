@@ -1,5 +1,5 @@
-import { EventsOutput, HistoryOutput, LinksHostsOutput } from "../protocols";
-import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository, getLinksLatestValuesByGroupIdRepository, getLinksProblemsByGroupIpRepository } from "../repositories";
+import { EventsOutput, HistoryOutput, LinksLatestValuesByLocation } from "../protocols";
+import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository, getLinksLatestValuesByGroupIdRepository, getLinksProblemsByGroupIpRepository, getLinksLocationsRepository, getLinksLastValuesByGroupIdLocationRepository } from "../repositories";
 import moment from "moment";
 
 export async function getLastValueHistoryService() {
@@ -46,10 +46,23 @@ export async function getLastValueHistoryService() {
 }
 
 export async function getLinksValuesProblemsService(groupId: number) {
-    const latestLinkValues = await getLinksLatestValuesByGroupIdRepository(groupId);
-    const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
-    const response = {values: latestLinkValues, problems: linksProblems};
-    return(response);
+    if(groupId === 216 || groupId === 588){
+        const locations = await getLinksLocationsRepository(groupId);
+        const latestLinkValues: LinksLatestValuesByLocation[] = [];
+        for (let i=0; i<locations.length; i++){
+            const location = locations[i].location;
+            const locationLinkValues = await getLinksLastValuesByGroupIdLocationRepository(groupId,location);
+            latestLinkValues.push({location: location, info: locationLinkValues});
+        }  
+        const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
+        const response = {values: latestLinkValues, problems: linksProblems};
+        return(response);
+    } else {
+        const latestLinkValues = await getLinksLatestValuesByGroupIdRepository(groupId);
+        const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
+        const response = {values: latestLinkValues, problems: linksProblems};
+        return(response);
+    }
 }
 
 export async function getLinksFirewallService() {

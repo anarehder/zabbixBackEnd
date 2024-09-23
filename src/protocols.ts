@@ -83,7 +83,7 @@ export type LinksHostsOutput = {
     groupid: number;
 }
 
-export type LinksLatestValues ={
+export type LinksLatestValues = {
     hostId: number;
     ip: string;
     hostName: string;
@@ -92,6 +92,17 @@ export type LinksLatestValues ={
     groupid: number;
     value: number;
     lastUpdate: string;
+    provider?: string;
+    location?: string;
+}
+
+export type LocationObject = {
+    location: string;
+  };
+
+export type LinksLatestValuesByLocation = {
+    location: string;
+    info: LinksLatestValues[];
 }
 
 export type LinksLatestProblems = {
@@ -201,4 +212,21 @@ export type hostGroupsInfo = {
     groupId: number;
     groupName: string;
     uuid: string;
+}
+
+export type last3MonthsAlertsOutput = {
+    Alerta: string;
+    month1: number;
+    month2: number;
+    month3: number;
+}
+
+export type last15DaysTotalAlerts = {
+    Day: string;
+    AlertOne: number;
+    Warning: number;
+    Average: number;
+    High: number;
+    Disaster: number;
+    Total: number;
 }

@@ -1,5 +1,5 @@
 import { db } from "../config/database";
-import { hostGroupsInfo, LinksHostsOutput, LinksLatestValues } from "../protocols";
+import { hostGroupsInfo, LinksHostsOutput, LinksLatestValues, LocationObject } from "../protocols";
 import { RowDataPacket } from "mysql2";
 
 export async function getHostsRepository() {
@@ -65,6 +65,68 @@ export async function getHostGroupsLinksRepository(groupName: string) {
     }));
     
     return typedResults;
+}
+
+export async function getLinksLocationsRepository(groupId: number){
+    const [rows] = await db.query<RowDataPacket[]>(`
+        SELECT DISTINCT (TRIM(SUBSTRING_INDEX(host, '-', -1))) AS location
+        FROM hosts_groups 
+        JOIN hosts ON hosts.hostid = hosts_groups.hostid
+        WHERE groupid = ?`,
+    [groupId]);
+
+    const typedResults: LocationObject[] = rows.map((row) => ({
+        location: row.location,
+    }));
+
+    return typedResults;
+}
+
+export async function getLinksLastValuesByGroupIdLocationRepository (groupId: number, location: string){
+    const [rows] = await db.query<RowDataPacket[]>(`
+        SELECT h.hostid, 
+            (SELECT interface.ip 
+                FROM interface 
+                WHERE interface.hostid = h.hostid 
+                LIMIT 1) AS Interface,  -- Subconsulta para pegar um único IP por host
+            h.name AS host_name, 
+            TRIM(SUBSTRING_INDEX(host, '-', -1)) AS location,
+            TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(host, '-', 2), '-', -1)) AS provider,
+            i.itemid, 
+            i.name AS item_name, 
+            hg.groupid, 
+            t1.value, 
+            FROM_UNIXTIME(t1.clock) AS last_update
+        FROM hosts_groups hg
+        JOIN hosts h ON hg.hostid = h.hostid
+        JOIN items i ON i.hostid = h.hostid
+        JOIN history_uint t1 ON t1.itemid = i.itemid
+        INNER JOIN (
+            SELECT itemid, MAX(clock) AS max_clock
+            FROM history_uint
+            GROUP BY itemid
+        ) t2 ON t1.itemid = t2.itemid AND t1.clock = t2.max_clock
+        WHERE hg.groupid = ?
+        AND i.name LIKE ?
+        AND h.name LIKE ?
+        ORDER BY h.name ASC;`
+        ,
+        [groupId, '%ICMP ping%',`%- ${location}%`]);
+
+        const typedResults: LinksLatestValues[] = rows.map((row) => ({
+            hostId: row.hostid,
+            ip: row.Interface,
+            hostName: row.host_name,
+            itemId: row.itemid,
+            itemName: row.item_name,
+            groupid: row.groupid,
+            value: row.value,
+            lastUpdate: row.last_update,
+            location: row.location,
+            provider: row.provider
+        }));
+
+        return typedResults;
 }
 
 export async function getLinksLatestValuesByGroupIdRepository (groupId: number){
