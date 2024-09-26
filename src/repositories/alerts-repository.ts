@@ -1,4 +1,4 @@
-import { alertsOutput, last15DaysTotalAlerts, last3MonthsAlertsOutput } from "@/protocols";
+import { alertsOutput, last15DaysTotalAlerts, last3MonthsAlertsOutput } from "../protocols";
 import { db } from "../config/database";
 import { RowDataPacket } from "mysql2";
 

@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2";
 import { db } from "../config/database";
 import axios from "axios";
-import { LinksLatestProblems } from "@/protocols";
+import { LinksLatestProblems } from "../protocols";
 
 const apiUrl = "http://100.101.1.189/api_jsonrpc.php";
 const authToken = '579099a2ea5c124912efa2b8c2bc0aa7338123beb0513aead603c2ebf4bff1cd';
