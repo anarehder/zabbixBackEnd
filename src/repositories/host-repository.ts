@@ -83,7 +83,7 @@ export async function getLinksLocationsRepository(groupId: number){
     return typedResults;
 }
 
-export async function getLinksLastValuesByGroupIdLocationRepository (groupId: number, location: string){
+export async function getLinksLastValuesByGroupIdLocationRepository2(groupId: number, location: string){
     const [rows] = await db.query<RowDataPacket[]>(`
         SELECT h.hostid, 
             (SELECT interface.ip 

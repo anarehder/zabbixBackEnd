@@ -1,4 +1,4 @@
-import { getLastValueHistoryController, getLinkDailyTrendByItemIdController, getLinksLiveController, getLinksValuesProblemsController, getMonthlyAverageByItemIdController, getMonthTrendByItemIdController } from "../controllers";
+import { getLinkDailyTrendByItemIdController, getLinksLiveByLocationController, getLinksLiveController, getMonthlyAverageByItemIdController, getMonthTrendByItemIdController } from "../controllers";
 import { validateBody } from "../middlewares";
 import { getMonthTrendsSchema } from "../schemas/getMonthTrends-schema";
 import { Router } from "express";
@@ -9,6 +9,6 @@ linksRouter.post("/report/trends/daily", validateBody(getMonthTrendsSchema), get
 linksRouter.post("/report/trends/monthly", validateBody(getMonthTrendsSchema), getMonthTrendByItemIdController)
 linksRouter.post("/report/problem", validateBody(getMonthTrendsSchema),getMonthlyAverageByItemIdController);
 linksRouter.get("/live/all/:groupId", getLinksLiveController);
-linksRouter.get("/live/location/:groupId", getLinksValuesProblemsController);
+linksRouter.get("/live/location/:groupId", getLinksLiveByLocationController);
 
 export {linksRouter}

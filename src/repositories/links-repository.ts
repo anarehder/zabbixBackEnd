@@ -94,3 +94,56 @@ export async function getLinksProblemsByGroupIpRepository(groupId: number) {
 
     return typedResults;
 }
+
+export async function getLinksLastValuesByGroupIdLocationRepository(groupId: number, location: string){
+    const [rows] = await db.query<RowDataPacket[]>(`
+        SELECT h.hostid, 
+            (SELECT interface.ip 
+                FROM interface 
+                WHERE interface.hostid = h.hostid 
+                LIMIT 1) AS ip,  -- Subconsulta para pegar um único IP por host
+            h.name AS hostName, 
+            TRIM(SUBSTRING_INDEX(host, '-', -1)) AS location,
+            TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(host, '-', 2), '-', -1)) AS provider,
+            i.itemid AS itemId, 
+            i.name AS itemName, 
+            hg.groupid, 
+            t1.value,
+            hi.location_lat AS lat,
+			hi.location_lon AS lon,
+			hi.notes AS notes,
+            FROM_UNIXTIME(t1.clock) AS last_update
+        FROM hosts_groups hg
+        JOIN hosts h ON hg.hostid = h.hostid
+        JOIN items i ON i.hostid = h.hostid
+        JOIN history_uint t1 ON t1.itemid = i.itemid
+        JOIN host_inventory hi ON h.hostid = hi.hostid
+        INNER JOIN (
+            SELECT itemid, MAX(clock) AS max_clock
+            FROM history_uint
+            GROUP BY itemid
+        ) t2 ON t1.itemid = t2.itemid AND t1.clock = t2.max_clock
+        WHERE hg.groupid = ?
+        AND i.name LIKE ?
+        AND h.name LIKE ?
+        ORDER BY h.name ASC;`,
+        [groupId, '%ICMP ping%',`%- ${location}%`]);
+
+        const typedResults: LinksLatestValues[] = rows.map((row) => ({
+            hostId: row.hostId,
+            ip: row.interface,
+            hostName: row.hostName,
+            itemId: row.itemId,
+            itemName: row.itemName,
+            groupid: row.groupId,
+            value: row.value,
+            lat: row.lat ? row.lat : "-",
+            lon: row.lon ? row.lon : "-",
+            notes: row.notes ? row.notes : "-",   
+            lastUpdate: row.lastUpdate,
+            location: row.location,
+            provider: row.provider            
+        }));
+
+        return typedResults;
+}

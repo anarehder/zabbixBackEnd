@@ -1,5 +1,5 @@
 import { EventsOutput, HistoryOutput, LinksLatestValuesByLocation } from "../protocols";
-import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository, getLinksLatestValuesByGroupIdRepository, getLinksProblemsByGroupIpRepository, getLinksLocationsRepository, getLinksLastValuesByGroupIdLocationRepository } from "../repositories";
+import { getLastValueHistoryRepository, getLinkHostsWithItems, getHostsLinksFirewallRepository, getProblemsByHostidListRepository, getValuesUINTRespository, getHostsServersRepository, getLinksLatestValuesByGroupIdRepository, getLinksProblemsByGroupIpRepository, getLinksLocationsRepository, getLinksLastValuesByGroupIdLocationRepository2 } from "../repositories";
 import moment from "moment";
 
 export async function getLastValueHistoryService() {
@@ -50,7 +50,7 @@ export async function getLinksValuesProblemsService(groupId: number) {
     const latestLinkValues: LinksLatestValuesByLocation[] = [];
     for (let i = 0; i < locations.length; i++) {
         const location = locations[i].location;
-        const locationLinkValues = await getLinksLastValuesByGroupIdLocationRepository(groupId, location);
+        const locationLinkValues = await getLinksLastValuesByGroupIdLocationRepository2(groupId, location);
         latestLinkValues.push({ location: location, info: locationLinkValues });
     }
     const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
