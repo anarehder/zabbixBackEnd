@@ -94,6 +94,9 @@ export type LinksLatestValues = {
     lastUpdate: string;
     provider?: string;
     location?: string;
+    lat?: string;
+    lon?: string;
+    notes?: string;
 }
 
 export type LocationObject = {

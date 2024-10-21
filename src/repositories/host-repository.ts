@@ -72,7 +72,8 @@ export async function getLinksLocationsRepository(groupId: number){
         SELECT DISTINCT (TRIM(SUBSTRING_INDEX(host, '-', -1))) AS location
         FROM hosts_groups 
         JOIN hosts ON hosts.hostid = hosts_groups.hostid
-        WHERE groupid = ?`,
+        WHERE groupid = ?
+        ORDER BY location ASC`,
     [groupId]);
 
     const typedResults: LocationObject[] = rows.map((row) => ({

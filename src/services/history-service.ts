@@ -46,23 +46,16 @@ export async function getLastValueHistoryService() {
 }
 
 export async function getLinksValuesProblemsService(groupId: number) {
-    if(groupId === 216 || groupId === 588){
-        const locations = await getLinksLocationsRepository(groupId);
-        const latestLinkValues: LinksLatestValuesByLocation[] = [];
-        for (let i=0; i<locations.length; i++){
-            const location = locations[i].location;
-            const locationLinkValues = await getLinksLastValuesByGroupIdLocationRepository(groupId,location);
-            latestLinkValues.push({location: location, info: locationLinkValues});
-        }  
-        const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
-        const response = {values: latestLinkValues, problems: linksProblems};
-        return(response);
-    } else {
-        const latestLinkValues = await getLinksLatestValuesByGroupIdRepository(groupId);
-        const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
-        const response = {values: latestLinkValues, problems: linksProblems};
-        return(response);
+    const locations = await getLinksLocationsRepository(groupId);
+    const latestLinkValues: LinksLatestValuesByLocation[] = [];
+    for (let i = 0; i < locations.length; i++) {
+        const location = locations[i].location;
+        const locationLinkValues = await getLinksLastValuesByGroupIdLocationRepository(groupId, location);
+        latestLinkValues.push({ location: location, info: locationLinkValues });
     }
+    const linksProblems = await getLinksProblemsByGroupIpRepository(groupId);
+    const response = { values: latestLinkValues, problems: linksProblems };
+    return (response);
 }
 
 export async function getLinksFirewallService() {
