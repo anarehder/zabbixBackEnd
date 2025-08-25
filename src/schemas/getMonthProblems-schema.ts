@@ -5,3 +5,7 @@ export const getMonthProblemsSchema = Joi.object<MonthProblemParams>({
     hostid: Joi.number().required(),
     month: Joi.string().regex(/^\d{4}-\d{2}$/).required()
 })
+
+export const monthSchema = Joi.object({
+    month: Joi.string().regex(/^\d{4}-\d{2}$/).required()
+})

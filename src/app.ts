@@ -3,7 +3,7 @@ import express, { Express } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDb } from "./config/database";
-import { alertsRouter, eventRouter, historyRouter, hostRouter, linksRouter, problemRouter, reportRouter } from "./routers";
+import { alertsRouter, denodoRouter, eventRouter, historyRouter, hostRouter, linksRouter, problemRouter, reportRouter } from "./routers";
 import { itemRouter } from "./routers/item-router";
 import { trendRouter } from "./routers/trend-router";
 
@@ -15,6 +15,7 @@ app
   .use(express.json())
   .get("/health", (_req, res) => res.send("OK!"))
   .use("/alerts", alertsRouter)
+  .use("/denodo", denodoRouter)
   .use("/trend", trendRouter)
   .use("/problem", problemRouter)
   .use("/item", itemRouter)

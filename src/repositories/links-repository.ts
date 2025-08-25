@@ -29,14 +29,14 @@ export async function getLinksValuesByGroupIdRepository(groupId: number) {
         GROUP BY itemid
     ) t2 ON t1.itemid = t2.itemid AND t1.clock = t2.max_clock
     WHERE 
-        hg.groupid = 588 AND 
+        hg.groupid = ? AND 
         i.name LIKE '%ICMP ping%'
     ORDER BY h.name ASC;`, 
     [groupId, '%ICMP ping%']);
 
     const typedResults: LinksLatestValues[] = rows.map((row) => ({
         hostId: row.hostId,
-        ip: row.interface,
+        ip: row.ip,
         hostName: row.hostName,
         itemId: row.itemId,
         itemName: row.itemName,

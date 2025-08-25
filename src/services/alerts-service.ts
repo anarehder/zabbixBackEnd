@@ -1,5 +1,5 @@
 import { alertsInput, alertsOutput } from "../protocols";
-import { getAllHostsDayAlertsRepository, getAllHostsRangeAlertsRepository, getDayAlertsRepository, getRangeAlertsRepository, last15DaysTotalAlertsRepository, last3MonthsTotalByAlertRepository, lastMonthTop10AlertsRepository, lastMonthTop10HostsAlertsRepository } from "../repositories";
+import { getAllHostsDayAlertsRepository, getAllHostsRangeAlertsRepository, getDayAlertsRepository, getLastMonthAlertsRepository, getRangeAlertsRepository, last15DaysTotalAlertsRepository, last3MonthsTotalByAlertRepository, lastMonthTop10AlertsRepository, lastMonthTop10HostsAlertsRepository, lastMonthTotalAlertsRepository } from "../repositories";
 
 export async function getAlretsService(body: alertsInput){
     //verificar o groupid
@@ -42,6 +42,32 @@ export async function getAlertsDashboardService(groupId: number, time: string){
     const response = {values, months, top_hosts, total_alerts};
     return response;    
 }
+
+export async function getLastMonthAlertsService(groupId: number){
+    const response = await getLastMonthAlertsRepository(groupId);
+    return response;    
+}
+
+export async function getLastMonthAlertsDashService(groupId: number){
+    const whereCondition = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1`;
+    const formattedTime = "";
+
+    const values = await lastMonthTop10AlertsRepository(whereCondition);
+    const eventsNameArray = values.map(obj => obj.Alerta);
+    
+    const top_hosts = await lastMonthTop10HostsAlertsRepository(whereCondition);
+
+    const months = await last3MonthsTotalByAlert(eventsNameArray, formattedTime);
+
+    const groupWhereCondition = `${whereCondition} AND hstgrp.groupid = ${groupId}`;
+    const total_alerts = await lastMonthTotalAlertsRepository(groupWhereCondition);
+
+    const response = {values, months, top_hosts, total_alerts};
+    return response;    
+}
+
+
+
 
 export async function top10AlertsValuesDashboard(groupId: number, formattedTime: string){
     if (groupId ===  0){

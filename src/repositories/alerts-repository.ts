@@ -104,6 +104,56 @@ export async function getRangeAlertsRepository(groupId: number, date_interval: s
     return response[0];
 }
 
+export async function getLastMonthAlertsRepository(groupId: number) {
+    const response = await db.query (
+        `SELECT
+            hosts.name AS Host,
+            MAX(interface.ip) AS Interface,
+            events.name AS Alerta,
+            CASE 
+                WHEN events.severity = 2 THEN 'Warning'
+                WHEN events.severity = 3 THEN 'Average'
+                WHEN events.severity = 4 THEN 'High'
+                WHEN events.severity = 5 THEN 'Disaster'
+                ELSE 'Outro' 
+            END AS Severidade,
+            COUNT(DISTINCT events.eventid) AS Total, -- Contando cada evento apenas uma vez
+            hstgrp.name AS groupName,
+            events.severity AS event_severity,
+            GROUP_CONCAT(DISTINCT FROM_UNIXTIME(events.clock)) AS event_times,
+            GROUP_CONCAT(DISTINCT events.eventid) AS event_ids,
+            GROUP_CONCAT(DISTINCT items.name) AS items,            
+            GROUP_CONCAT(DISTINCT CONCAT(items.description, ' ', triggers.comments)) AS items_descrip     
+        FROM
+            events 
+        LEFT JOIN (
+            SELECT MIN(itemid) AS min_itemid, triggerid
+            FROM functions
+            GROUP BY triggerid
+        ) AS functions ON functions.triggerid = events.objectid
+        LEFT JOIN
+            triggers ON triggers.triggerid =events.objectid
+        LEFT JOIN
+            items ON items.itemid = functions.min_itemid
+        LEFT JOIN
+            hosts ON hosts.hostid = items.hostid
+        LEFT JOIN
+            hosts_groups ON hosts_groups.hostid = hosts.hostid
+        LEFT JOIN
+                interface ON interface.hostid = hosts.hostid
+        LEFT JOIN
+            hstgrp ON hstgrp.groupid = hosts_groups.groupid 
+        WHERE 
+            hstgrp.groupid = ? AND events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01')) AND events.severity >= 3 AND events.value = 1
+        GROUP BY 
+            hosts.name, events.name, events.severity -- Removendo a agregação por events.name
+        ORDER BY
+            total DESC;`,
+        [groupId]
+    );
+    return response[0];
+}
+
 export async function getAllHostsDayAlertsRepository(date_interval: string, limit: number, severity: number) {
     const response = await db.query (
         `SELECT
@@ -432,3 +482,50 @@ export async function last15DaysTotalAlertsRepository(whereCondition: string){
     }));
     return typedResults;
 }
+
+
+export async function lastMonthTotalAlertsRepository(whereCondition: string){
+    const [rows] = await db.query<RowDataPacket[]>(
+        `SELECT 
+            DATE(FROM_UNIXTIME(events.clock)) AS Day,
+            COUNT(CASE WHEN events.severity = 1 THEN 1 END) AS AlertOne,
+            COUNT(CASE WHEN events.severity = 2 THEN 1 END) AS Warning,
+            COUNT(CASE WHEN events.severity = 3 THEN 1 END) AS Average,
+            COUNT(CASE WHEN events.severity = 4 THEN 1 END) AS High,
+            COUNT(CASE WHEN events.severity = 5 THEN 1 END) AS Disaster,
+            COUNT(*) AS Total
+        FROM events
+        LEFT JOIN (
+            SELECT MIN(itemid) AS min_itemid, triggerid
+            FROM functions
+            GROUP BY triggerid
+        ) AS functions ON functions.triggerid = events.objectid
+        LEFT JOIN
+            triggers ON triggers.triggerid =events.objectid
+        LEFT JOIN
+            items ON items.itemid = functions.min_itemid
+        LEFT JOIN
+            hosts ON hosts.hostid = items.hostid
+        LEFT JOIN
+            hosts_groups ON hosts_groups.hostid = hosts.hostid
+        LEFT JOIN
+            interface ON interface.hostid = hosts.hostid
+        LEFT JOIN
+            hstgrp ON hstgrp.groupid = hosts_groups.groupid 
+        WHERE 
+            ${whereCondition}
+        GROUP BY 
+            DATE(FROM_UNIXTIME(events.clock));`
+    );
+    const typedResults: last15DaysTotalAlerts[] = rows.map((row) => ({
+        Day: row.Day,
+        AlertOne: row.AlertOne,
+        Warning: row.Warning,
+        Average: row.Average,
+        High: row.High,
+        Disaster: row.Disaster,
+        Total: row.Total        
+    }));
+    return typedResults;
+}
+
