@@ -34,6 +34,7 @@ export async function getAlertsDashboardController(req: Request, res: Response) 
 }
 
 export async function getLastMonthAlertsController(req: Request, res: Response) {
+    console.log(req.params);
     const {groupId} = req.params;
     if (isNaN(Number(groupId))){
         return res.status(httpStatus.NOT_ACCEPTABLE).send("groupId as a string, it must be a number");

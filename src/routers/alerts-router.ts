@@ -6,8 +6,8 @@ import { Router } from "express";
 const alertsRouter = Router();
 
 alertsRouter.post("/", validateBody(getAlertsSchema), getAlertsController);
-alertsRouter.get("/relatorio/lista/:groupid", getLastMonthAlertsController);
-alertsRouter.get("/realtorio/dash/:groupid", getLastMonthAlertsDashController);
+alertsRouter.get("/relatorio/lista/:groupId", getLastMonthAlertsController);
+alertsRouter.get("/relatorio/dash/:groupId", getLastMonthAlertsDashController);
 alertsRouter.post("/allhosts", validateBody(getAlertsSchema), getAllHostsAlertsController);
 alertsRouter.get("/dashboards/:groupId/:time", getAlertsDashboardController);
 

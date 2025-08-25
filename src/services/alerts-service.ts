@@ -49,18 +49,18 @@ export async function getLastMonthAlertsService(groupId: number){
 }
 
 export async function getLastMonthAlertsDashService(groupId: number){
-    const whereCondition = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1`;
+    const whereConditionDisaster = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND hstgrp.groupid = ${groupId}`;
+    const whereCondition = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 3 AND events.value = 1 AND hstgrp.groupid = ${groupId}`;
     const formattedTime = "";
 
-    const values = await lastMonthTop10AlertsRepository(whereCondition);
+    const values = await lastMonthTop10AlertsRepository(whereConditionDisaster);
     const eventsNameArray = values.map(obj => obj.Alerta);
     
-    const top_hosts = await lastMonthTop10HostsAlertsRepository(whereCondition);
+    const top_hosts = await lastMonthTop10HostsAlertsRepository(whereConditionDisaster);
 
     const months = await last3MonthsTotalByAlert(eventsNameArray, formattedTime);
 
-    const groupWhereCondition = `${whereCondition} AND hstgrp.groupid = ${groupId}`;
-    const total_alerts = await lastMonthTotalAlertsRepository(groupWhereCondition);
+    const total_alerts = await lastMonthTotalAlertsRepository(whereCondition);
 
     const response = {values, months, top_hosts, total_alerts};
     return response;    
