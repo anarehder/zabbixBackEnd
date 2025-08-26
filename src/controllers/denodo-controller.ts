@@ -38,3 +38,34 @@ export async function getLinksJSPecas(req: Request, res: Response) {
         return res.status(httpStatus.BAD_REQUEST).send(error.message);
     }
 }
+
+export async function getDBDataJSPecas(req: Request, res: Response) {
+
+    try {
+        const user = process.env.DENODO_USER;
+        const password = process.env.DENODO_PASSWORD;
+
+        // http://localhost:9090/denodo-restfulws/zabbix/views/dv_items_history_servidor_db_jspecas
+        const url = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_items_history_servidor_db_jspecas`;
+        console.log(url);
+        // Create Basic Auth header
+        const authString = btoa(`${user}:${password}`);
+
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Basic ${authString}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        // console.log(response.data);
+        if (!response.status) {
+            if (response.status === 401) {
+                throw new Error('Credenciais inválidas. Verifique usuário e senha.');
+            }
+            throw new Error(`Erro na requisição: ${response.status}`);
+        }
+        return res.status(httpStatus.OK).send(response.data);
+    } catch (error) {
+        return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    }
+}
