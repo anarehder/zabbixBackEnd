@@ -45,8 +45,7 @@ export async function getDBDataJSPecas(req: Request, res: Response) {
         const user = process.env.DENODO_USER;
         const password = process.env.DENODO_PASSWORD;
 
-        // http://localhost:9090/denodo-restfulws/zabbix/views/dv_items_history_servidor_db_jspecas
-        const url = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_items_history_servidor_db_jspecas`;
+        const url = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_db_items_jspecas?$format=json`;
         console.log(url);
         // Create Basic Auth header
         const authString = btoa(`${user}:${password}`);
