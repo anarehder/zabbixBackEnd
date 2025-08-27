@@ -6,6 +6,6 @@ import { getDBDataJSPecas, getLinksJSPecas } from "../controllers";
 const denodoRouter = Router();
 
 denodoRouter.post("/monitoramento/links/jspecas", validateBody(monthSchema), getLinksJSPecas);
-denodoRouter.post("/monitoramento/db/jspecas", getDBDataJSPecas);
+denodoRouter.get("/monitoramento/db/jspecas", getDBDataJSPecas);
 
 export {denodoRouter}
