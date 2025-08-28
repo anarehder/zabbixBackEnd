@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getAlertsDashboardService, getAllHostsAlretsService, getAlretsService, getLastMonthAlertsDashService, getLastMonthAlertsService } from "../services";
+import { getAlertsDashboardService, getAletsJSPecasService, getAllHostsAlretsService, getAlretsService, getLastMonthAlertsDashService, getLastMonthAlertsService } from "../services";
 
 export async function getAlertsController(req: Request, res: Response) {
     try{
@@ -54,7 +54,16 @@ export async function getLastMonthAlertsDashController(req: Request, res: Respon
         return res.status(httpStatus.NOT_ACCEPTABLE).send("groupId as a string, it must be a number");
     }
     try{
-        const response = await getLastMonthAlertsDashService(Number(groupId))
+        const response = await getLastMonthAlertsDashService(groupId);
+        return res.status(httpStatus.OK).send(response);
+    } catch(error) {
+        return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    }
+}
+
+export async function getAletsJSPecasController(req: Request, res: Response) {
+    try{
+        const response = await getAletsJSPecasService();
         return res.status(httpStatus.OK).send(response);
     } catch(error) {
         return res.status(httpStatus.BAD_REQUEST).send(error.message);

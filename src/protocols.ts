@@ -199,11 +199,11 @@ export type alertsInput = {
 
 export type alertsOutput = {
     Host: string;
-    Interface: string;
+    Interface?: string;
     Alerta: string;
     Severidade: string;
     Total: number;
-    groupName: string;
+    groupName?: string;
     event_severity: number;
     event_ids?: string;
     event_times?: string;
@@ -231,5 +231,5 @@ export type last15DaysTotalAlerts = {
     Average: number;
     High: number;
     Disaster: number;
-    Total: number;
+    Total?: number;
 }

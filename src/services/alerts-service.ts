@@ -1,5 +1,5 @@
 import { alertsInput, alertsOutput } from "../protocols";
-import { getAllHostsDayAlertsRepository, getAllHostsRangeAlertsRepository, getDayAlertsRepository, getLastMonthAlertsRepository, getRangeAlertsRepository, last15DaysTotalAlertsRepository, last3MonthsTotalByAlertRepository, lastMonthTop10AlertsRepository, lastMonthTop10HostsAlertsRepository, lastMonthTotalAlertsRepository } from "../repositories";
+import { getAllHostsDayAlertsRepository, getAllHostsRangeAlertsRepository, getDayAlertsRepository, getLastMonthAlertsRepository, getLastMonthByNameAlertsRepository, getRangeAlertsRepository, last15DaysTotalAlertsRepository, last3MonthsTotalByAlertRepository, lastMonthTop10AlertsRepository, lastMonthTop10HostsAlertsRepository, lastMonthTotalAlertsRepository } from "../repositories";
 
 export async function getAlretsService(body: alertsInput){
     //verificar o groupid
@@ -48,12 +48,28 @@ export async function getLastMonthAlertsService(groupId: number){
     return response;    
 }
 
-export async function getLastMonthAlertsDashService(groupId: number){
+export async function getAletsJSPecasService() {
+    const name = 'JS_Pecas';
+    const wcDisasterName = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND events.name like '%JS_Pecas%'`;
+    const values = await lastMonthTop10AlertsRepository(wcDisasterName);
+    const top_hosts = await lastMonthTop10HostsAlertsRepository(wcDisasterName);
+    const months = await last3MonthsTotalByAlertRepository(name);
+    const total_alerts = await lastMonthTotalAlertsRepository(name);
+    const list = await getLastMonthByNameAlertsRepository(name);
+    const response = {values, months, top_hosts, total_alerts, list};
+    return response;  
+}
+
+export async function getLastMonthAlertsDashService(groupId: string){
+    const groupIdNames: Record<string, string> = {
+        715: '%JS_Pecas%',
+    };
     const whereConditionDisaster = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND hstgrp.groupid = ${groupId}`;
+    const wcDisasterName = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND events.name like '%${groupIdNames[groupId]}%'`
     const whereCondition = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 3 AND events.value = 1 AND hstgrp.groupid = ${groupId}`;
     const formattedTime = "";
 
-    const values = await lastMonthTop10AlertsRepository(whereConditionDisaster);
+    const values = await lastMonthTop10AlertsRepository(groupId === '715' ? wcDisasterName : whereConditionDisaster);
     const eventsNameArray = values.map(obj => obj.Alerta);
     
     const top_hosts = await lastMonthTop10HostsAlertsRepository(whereConditionDisaster);
@@ -84,7 +100,7 @@ export async function top10AlertsValuesDashboard(groupId: number, formattedTime:
 export async function last3MonthsTotalByAlert(eventsNameArray: string[], formattedTime: string) {
     const arrayResponse = [];
     for (let i=0; i<eventsNameArray.length; i++){
-        const response = await last3MonthsTotalByAlertRepository(eventsNameArray[i], formattedTime);
+        const response = await last3MonthsTotalByAlertRepository(eventsNameArray[i]);
         arrayResponse.push(response);
     }
     return arrayResponse;
