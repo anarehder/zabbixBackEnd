@@ -49,13 +49,15 @@ export async function getLastMonthAlertsService(groupId: number){
 }
 
 export async function getAletsJSPecasService() {
-    const name = 'JS_Pecas';
+    const name = '%JS_Pecas%';
     const wcDisasterName = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND events.name like '%JS_Pecas%'`;
     const values = await lastMonthTop10AlertsRepository(wcDisasterName);
     const top_hosts = await lastMonthTop10HostsAlertsRepository(wcDisasterName);
+    console.log(name);
     const months = await last3MonthsTotalByAlertRepository(name);
     const total_alerts = await lastMonthTotalAlertsRepository(name);
     const list = await getLastMonthByNameAlertsRepository(name);
+    console.log(months);
     const response = {values, months, top_hosts, total_alerts, list};
     return response;  
 }

@@ -383,7 +383,7 @@ export async function lastMonthTop10AlertsRepository(whereCondition: string){
 }
 
 export async function last3MonthsTotalByAlertRepository(name: string){
-    const [rows] = await db.query<RowDataPacket[]>(
+    const response = await db.query(
         `SELECT
             events.name AS Alerta,    
             SUM(CASE 
@@ -404,22 +404,17 @@ export async function last3MonthsTotalByAlertRepository(name: string){
         FROM 
             events
         WHERE 
-            events.severity >= 5 
+            events.severity >= 5
             AND events.value = 1
             AND events.name like ?
         GROUP BY
             events.name 
         ORDER BY
-            month1 desc;
-        ;`, [name]
+            month1 DESC;`,
+        [name]
     );
-    const typedResults: last3MonthsAlertsOutput[] = rows.map((row) => ({
-        Alerta: row.Alerta,
-        month1: row.month1,
-        month2: row.month2,
-        month3: row.month3
-    }));
-    return typedResults[0];
+    
+    return response[0];
 }
 
 
