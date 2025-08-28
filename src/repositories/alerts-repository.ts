@@ -108,7 +108,7 @@ export async function getRangeAlertsRepository(groupId: number, date_interval: s
 export async function getLastMonthByNameAlertsRepository(name: string) {
     const response = await db.query (
         `SELECT
-            GROUP_CONCAT(DISTINCT hosts.name) AS Host,
+            hosts.name AS Host,
             events.name AS Alerta,
             CASE
                 WHEN events.severity = 2 THEN 'Warning'
@@ -149,11 +149,11 @@ export async function getLastMonthByNameAlertsRepository(name: string) {
             AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))
             AND events.severity >= 4
             AND events.value = 1
-            AND events.name like ?
+            AND (hosts.host like ? or events.name like ?)
         GROUP BY
             events.name,
             events.severity
-            -- Removendo a agregação por events.name
+            hosts.host
         ORDER BY
             total DESC;`,
         [name]
