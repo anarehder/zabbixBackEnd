@@ -55,9 +55,12 @@ export async function getAletsJSPecasService() {
     const top_hosts = await lastMonthTop10HostsAlertsRepository(wcDisasterName);
     console.log(name);
     const months = await last3MonthsTotalByAlertRepository(name);
+    console.log("months");
     const total_alerts = await lastMonthTotalAlertsRepository(name);
+    console.log("total_alerts");
     const list = await getLastMonthByNameAlertsRepository(name);
-    console.log(months);
+    console.log("list");
+    
     const response = {values, months, top_hosts, total_alerts, list};
     return response;  
 }

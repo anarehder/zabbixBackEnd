@@ -108,7 +108,7 @@ export async function getRangeAlertsRepository(groupId: number, date_interval: s
 export async function getLastMonthByNameAlertsRepository(name: string) {
     const response = await db.query (
         `SELECT
-            hosts.name AS Host,
+            GROUP_CONCAT(DISTINCT hosts.name) AS Host,
             events.name AS Alerta,
             CASE
                 WHEN events.severity = 2 THEN 'Warning'
@@ -149,10 +149,10 @@ export async function getLastMonthByNameAlertsRepository(name: string) {
             AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))
             AND events.severity >= 4
             AND events.value = 1
-            AND (hosts.host like ? or events.name like ?)
+            AND hosts.host like ?
         GROUP BY
             events.name,
-            events.severity
+            events.severity,
             hosts.host
         ORDER BY
             total DESC;`,
@@ -204,7 +204,7 @@ export async function getLastMonthAlertsRepository(groupId: number) {
         WHERE 
             hstgrp.groupid = ? AND events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01')) AND events.severity >= 3 AND events.value = 1
         GROUP BY 
-            hosts.name, events.name, events.severity -- Removendo a agregação por events.name
+            hosts.name, events.name, events.severity
         ORDER BY
             total DESC;`,
         [groupId]
@@ -253,7 +253,7 @@ export async function getAllHostsDayAlertsRepository(date_interval: string, limi
         WHERE 
             events.clock >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ${date_interval})) AND events.severity >= ? AND events.value = 1
         GROUP BY 
-            hosts.name, events.name, events.severity -- Removendo a agregação por events.name
+            hosts.name, events.name, events.severity
         ORDER BY
             total DESC
 		LIMIT ?;`,
@@ -303,7 +303,7 @@ export async function getAllHostsRangeAlertsRepository(date_interval: string, li
         WHERE 
             events.clock >= UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ${date_interval})) AND events.severity >= ? AND events.value = 1
         GROUP BY 
-            hosts.name, events.name, events.severity -- Removendo a agregação por events.name
+            hosts.name, events.name, events.severity 
         ORDER BY
             total DESC
 		LIMIT ?;`,

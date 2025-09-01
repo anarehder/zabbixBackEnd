@@ -15,7 +15,7 @@ export async function getLinksJSPecas(req: Request, res: Response) {
         nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
         const endDate = nextMonthDate.toISOString().slice(0, 10);
 
-        const url = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_trendsglobo_registro_br?$format=json&$groupby=itemid&$select=itemid,avg(value_min),avg(value_max),first(host),first(items_name)&$filter=date_time%3E%3D%27${startDate}%27&$filter=date_time%3C%27${endDate}%27`;
+        const url = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_trendsglobo_registro_br?$format=json&$groupby=itemid&$select=itemid,avg(value_min),avg(value_max),first(host),first(items_name)&$filter=date_time%3E%3D%27${startDate}%27%20AND%20date_time%3C%27${endDate}%27`;
         console.log(url);
         // Create Basic Auth header
         const authString = btoa(`${user}:${password}`);
@@ -109,6 +109,60 @@ export async function getDBDataJSPecas(req: Request, res: Response) {
         }
 
         const response = {servidor: responseServ.data, tables: responseTables.data, space: responseSpace.data}
+        return res.status(httpStatus.OK).send(response);
+    } catch (error) {
+        return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    }
+}
+
+
+export async function getJiraJSPecas(req: Request, res: Response) {
+    const month: string = req.body.month;
+    console.log(month);
+    try {
+        const user = process.env.DENODO_USER;
+        const password = process.env.DENODO_PASSWORD;
+        const authString = btoa(`${user}:${password}`);
+        // Create date range: first day of selected month to first day of next month
+        const startDate = `${month}-01`;
+        const nextMonthDate = new Date(month + '-01');
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        const endDate = nextMonthDate.toISOString().slice(0, 10);
+
+        const urlW =`http://100.101.1.13:9090/denodo-restfulws/jira/views/dv_js_worklogs_80d?$format=json&$groupby=ISSUE_ID&$select=ISSUE_ID,group_concat(distinct(ISSUE_KEY))%20as%20key,group_concat(distinct(UPDATED))%20as%20updated,group_concat(distinct(AUTHOR_NAME))%20as%20authors,group_concat(distinct(date_br))%20as%20created,SUM(LOGGED_TIME)%20as%20total&$orderby=ISSUE_ID&$filter=date_br%3C%27${endDate}%27%20and%20date_br%3E%3D%27${startDate}%27`;
+        console.log(urlW);        
+
+        const responseWorklogs = await axios.get(urlW, {
+            headers: {
+                'Authorization': `Basic ${authString}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        // console.log(response.data);
+        if (!responseWorklogs.status) {
+            if (responseWorklogs.status === 401) {
+                throw new Error('Credenciais inválidas. Verifique usuário e senha.');
+            }
+            throw new Error(`Erro na requisição: ${responseWorklogs.status}`);
+        }
+
+        const urlL =`http://100.101.1.13:9090/denodo-restfulws/jira/views/bv_jira_80d_fields_jspecas?$format=json`;
+
+        const responseList = await axios.get(urlL, {
+            headers: {
+                'Authorization': `Basic ${authString}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        // console.log(response.data);
+        if (!responseList.status) {
+            if (responseList.status === 401) {
+                throw new Error('Credenciais inválidas. Verifique usuário e senha.');
+            }
+            throw new Error(`Erro na requisição: ${responseList.status}`);
+        }
+
+        const response = {worklogs: responseWorklogs.data, list: responseList.data};
         return res.status(httpStatus.OK).send(response);
     } catch (error) {
         return res.status(httpStatus.BAD_REQUEST).send(error.message);
