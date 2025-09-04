@@ -39,6 +39,44 @@ export async function getLinksJSPecas(req: Request, res: Response) {
     }
 }
 
+export async function getFirewallJSPecas(req: Request, res: Response) {
+    const month: string = req.body.month;
+    console.log(month);
+    try {
+        const user = process.env.DENODO_USER;
+        const password = process.env.DENODO_PASSWORD;
+
+        // Create date range: first day of selected month to first day of next month
+        const startDate = `${month}-01`;
+        const nextMonthDate = new Date(month + '-01');
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        const endDate = nextMonthDate.toISOString().slice(0, 10);
+
+        const url = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_trends_firewall?$format=json&$groupby=itemid&$select=itemid,avg(value_min),avg(value_max),first(host),first(items_name)&$filter=date_time%3E%3D%27${startDate}%27%20AND%20date_time%3C%27${endDate}%27`;
+        console.log(url);
+        // Create Basic Auth header
+        const authString = btoa(`${user}:${password}`);
+
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Basic ${authString}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        // console.log(response.data);
+        if (!response.status) {
+            if (response.status === 401) {
+                throw new Error('Credenciais inválidas. Verifique usuário e senha.');
+            }
+            throw new Error(`Erro na requisição: ${response.status}`);
+        }
+        return res.status(httpStatus.OK).send(response.data);
+    } catch (error) {
+        return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    }
+}
+
+
 function getTodayDate() {
     const today = new Date();
     const year = today.getFullYear();
@@ -162,7 +200,23 @@ export async function getJiraJSPecas(req: Request, res: Response) {
             throw new Error(`Erro na requisição: ${responseList.status}`);
         }
 
-        const response = {worklogs: responseWorklogs.data, list: responseList.data};
+         const urlC =`http://100.101.1.13:9090/denodo-restfulws/jira/views/dv_jira_contratos?$format=json&$filter=%22Cliente_10117%22like%27%25JS%25%27`;
+
+        const responseContratos = await axios.get(urlC, {
+            headers: {
+                'Authorization': `Basic ${authString}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        // console.log(response.data);
+        if (!responseContratos.status) {
+            if (responseContratos.status === 401) {
+                throw new Error('Credenciais inválidas. Verifique usuário e senha.');
+            }
+            throw new Error(`Erro na requisição: ${responseContratos.status}`);
+        }
+
+        const response = {worklogs: responseWorklogs.data, list: responseList.data, contratos: responseContratos.data};
         return res.status(httpStatus.OK).send(response);
     } catch (error) {
         return res.status(httpStatus.BAD_REQUEST).send(error.message);
