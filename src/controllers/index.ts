@@ -1,5 +1,6 @@
 export * from "./alerts-controller";
 export * from "./denodo-js-controller";
+export * from "./denodo-pmz-controller";
 export * from "./event-controller";
 export * from "./history-controller";
 export * from "./host-controller";

@@ -98,7 +98,7 @@ export async function getDBDataJSPecas(req: Request, res: Response) {
 
         const urlText = `http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_dbitems_js_text?&$groupby=itemid&$select=itemid,first(host)%20as%20host,first(items_name)%20as%20items_name,first(itemid)%20as%20itemid,first(date_br)%20as%20date_Br,first(clock)%20as%20clock,first(value)%20as%20value&$format=json`;
         
-        const urlServ = 'http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_items_history_servidor_db_jspecas?$groupby=itemid&$select=itemid,first(host)%20as%20host,first(items_name)%20as%20items_name,first(itemid)%20as%20itemid,first(date_br)%20as%20date_br,first(clock)%20as%20clock,first(value)%20as%20value&$format=json';
+        const urlServ = 'http://100.101.1.13:9090/denodo-restfulws/zabbix/views/dv_hosts_db_servidor_js?$format=json';
 
         // console.log(url);
         // Create Basic Auth header
