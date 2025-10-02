@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
-import { getAlertsDashboardService, getAletsJSPecasService, getAllHostsAlretsService, getAlretsService, getLastMonthAlertsDashService, getLastMonthAlertsService } from "../services";
+import { getAlertsDashboardService, getAlertsPMZService, getAletsJSPecasService, getAllHostsAlretsService, getAlretsService, getLastMonthAlertsDashService, getLastMonthAlertsService } from "../services";
 
 export async function getAlertsController(req: Request, res: Response) {
     try{
@@ -64,6 +64,15 @@ export async function getLastMonthAlertsDashController(req: Request, res: Respon
 export async function getAletsJSPecasController(req: Request, res: Response) {
     try{
         const response = await getAletsJSPecasService();
+        return res.status(httpStatus.OK).send(response);
+    } catch(error) {
+        return res.status(httpStatus.BAD_REQUEST).send(error.message);
+    }
+}
+
+export async function getAlertsPMZController(req: Request, res: Response) {
+    try{
+        const response = await getAlertsPMZService();
         return res.status(httpStatus.OK).send(response);
     } catch(error) {
         return res.status(httpStatus.BAD_REQUEST).send(error.message);

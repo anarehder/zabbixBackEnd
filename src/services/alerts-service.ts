@@ -65,9 +65,27 @@ export async function getAletsJSPecasService() {
     return response;  
 }
 
+export async function getAlertsPMZService() {
+    const name = '%PEMAZA%';
+    const wcDisasterName = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND events.name like '%PEMAZA%'`;
+    const values = await lastMonthTop10AlertsRepository(wcDisasterName);
+    const top_hosts = await lastMonthTop10HostsAlertsRepository(wcDisasterName);
+    console.log(name);
+    const months = await last3MonthsTotalByAlertRepository(name);
+    console.log("months");
+    const total_alerts = await lastMonthTotalAlertsRepository(name);
+    console.log("total_alerts");
+    const list = await getLastMonthByNameAlertsRepository(name);
+    console.log("list");
+    
+    const response = {values, months, top_hosts, total_alerts, list};
+    return response;  
+}
+
 export async function getLastMonthAlertsDashService(groupId: string){
     const groupIdNames: Record<string, string> = {
         715: '%JS_Pecas%',
+        207: '%PEMAZA%',
     };
     const whereConditionDisaster = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND hstgrp.groupid = ${groupId}`;
     const wcDisasterName = `events.clock >= UNIX_TIMESTAMP(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01')) AND events.clock < UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-01'))AND events.severity >= 5 AND events.value = 1 AND events.name like '%${groupIdNames[groupId]}%'`
